@@ -1,4 +1,4 @@
-# Processing <img src="http://kiwisdr.com/.public/">KiwiSDR</a> datasets for assessing time and frequency transfer
+# Processing <a href="http://kiwisdr.com/.public/">KiwiSDR</a> datasets for assessing time and frequency transfer
 
 Recording GPS-timestamped KiwiSDR datasets from ALS162 (162 kHz), LORAN (100 kHz) and
 DCF77 (77.5 kHz) for assessing the impact of ionosphere and space weather disturbances
