@@ -48,11 +48,14 @@ to identify the beginning of the second:
 ### DCF77
 
 Using the <a href="https://www.eecis.udel.edu/~mills/ntp/dcf77.html">512-chip long</a> 
-pseudo-random sequence phase modulation to improve the signal to noise ratio by spreading 
+pseudo-random sequence phase modulation [1] to improve the signal to noise ratio by spreading 
 the spectrum to achieve fine time of flight measurement despite the low sampling rate of 
 12 kHz.
 
 <img src="dcf77.png">
+
+[1] <a href="https://www.ptb.de/cms/fileadmin/internet/fachabteilungen/abteilung_4/4.4_zeit_und_frequenz/pdf/5_1988_Hetzel_-_Proc_EFTF_88.pdf">P.Hetzel, Time dissemination via the LF transmitter DCF77 using a pseudo-random phase-shift 
+keying on the carrier, Proc. 2nd EFTF (1988)</a>
 
 ### LORAN-C
 
