@@ -23,27 +23,27 @@ addpath('./kiwiclient')
 
 # liste : http://kiwisdr.com/.public/
 
-dirname=dir('175*'); % '1754040062';
+dirname=dir('175*');         % directoty names index by Unix epoch
 for dirnum=1:length(dirname)
   dirname(dirnum).name
-  dlist=dir([dirname(dirnum).name,'/*162*wav']);
+  dlist=dir([dirname(dirnum).name,'/*162*wav']); % all ALS162 records
   for l=1:length(dlist)
     [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
-    if ((isinf(fs)==0)&&(fs>8000))
-      z=cat(1,xx.z);z=z(floor(fs/20):end);
-      t=cat(1,xx.t);t=t(floor(fs/20):end);
-      dt(dirnum)=floor(t(1));
+    if ((isinf(fs)==0)&&(fs>8000))               % check the file was interpreted correctly
+      z=cat(1,xx.z);z=z(floor(fs/20):end);       % IQ
+      t=cat(1,xx.t);t=t(floor(fs/20):end);       % time
+      dt(dirnum)=floor(t(1));                    % first integer GNSS timestamp second
       sol=[];
       for p=1:8
         if ((p==1)&&(dirnum==1)&&(l==2))
           figure
           subplot(311);plot(t(1:3*fs)-floor(t(1)),abs(z(1:3*fs)));hold on;xlabel('time (s)');ylabel('|I+jQ| (a.u.)');
         end
-        ph=unwrap(angle(z));ph=ph-mean(ph);
-        k=find((t-floor(t(1)))>p-0.05);
+        ph=unwrap(angle(z));ph=ph-mean(ph);      % ALS162 information encoded on phase
+        k=find((t-floor(t(1)))>p-0.05);          % integer second -50 ms
         if (isempty(k)==0)
           kinit=k(1);
-          k=find((t-floor(t(1)))>p+0.05);
+          k=find((t-floor(t(1)))>p+0.05);        % integer second +50 ms
           if (isempty(k)==0)
             kend=k(1);
             if (kend>kinit)
@@ -51,9 +51,9 @@ for dirnum=1:length(dirname)
               [~,posend]=min(ph(posinit:kend));posend=posend-1+posinit;
               if ((posend-posinit)>3)
                 a=polyfit(t(posinit:posend)-floor(t(1)),ph(posinit:posend),1);
-                sol(p)=-a(2)/a(1)-p;
+                sol(p)=-a(2)/a(1)-p;             % linear fit intersection with Y=0 at X=-b/a
               else
-                printf("echec polyfit\n");
+                printf("polyfit failure\n");
               end
               if ((p==1)&&(dirnum==1)&&(l==2))
                 subplot(312);plot(t(1:3*fs)-floor(t(1)),ph(1:3*fs));hold on;xlabel('time (s)');ylabel('arg(I+jQ) (rad)');

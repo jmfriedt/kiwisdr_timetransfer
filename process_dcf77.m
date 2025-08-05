@@ -25,38 +25,38 @@ addpath('./kiwiclient')
 # liste : http://kiwisdr.com/.public/
 
 lfsr=load('dcf77_lfsr.dat');
-np=12000*(120/77500);    % PRN chip length (120 periods of carrier)
+np=12000*(120/77500);       % PRN chip length (120 periods of carrier)
 oldP=0;
-for k=1:length(lfsr)
+for k=1:length(lfsr)        % interpolate LFSR code
    P=round(k*np);
    if (lfsr(k)==1) longlfsr(oldP+1:P)=ones(P-oldP,1);
      else longlfsr(oldP+1:P)=zeros(P-oldP,1);
    endif
    oldP=P;
 end
-longlfsr=longlfsr-mean(longlfsr);
+longlfsr=longlfsr-mean(longlfsr); % correlation: subtract mean value
 
 stdthres=8;
 dirname=dir('175*'); % '1754040062';
 for dirnum=1:length(dirname)
   dirname(dirnum).name
-  dlist=dir([dirname(dirnum).name,'/*77500*.wav']);
+  dlist=dir([dirname(dirnum).name,'/*77500*.wav']); % read all DCF77 records
   for l=1:length(dlist)
     [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
-    if ((isinf(fs)==0)&&(fs>10000))
+    if ((isinf(fs)==0)&&(fs>10000))                 % check the file was interpreted correctly
       z=cat(1,xx.z);z=z(floor(fs/20):end);
       t=cat(1,xx.t);t=t(floor(fs/20):end);
       dt(dirnum)=floor(t(1));
       sol=[];
-      ph=abs(xcorr(longlfsr,angle(z)-mean(angle(z))));
-      ph=fliplr(ph(1:length(t)));  % length(ph)/2
+      ph=abs(xcorr(longlfsr,angle(z)-mean(angle(z))));  % correlate DCF77 phase with code
+      ph=fliplr(ph(1:length(t)));  % length(ph)/2       % xcorr is from -delay to 0 -> flip to go from 0 to delay
 %      plot(t,ph);title(strrep([dirname(dirnum).name,'/',dlist(l).name],'_',' '));hold on
       for p=1:8
         if (((p+1)*fs)< length(ph))
           [valmax,posmax]=max(ph(floor((p*fs):floor((p+1)*fs))));posmax=posmax+floor(p*fs)-1;
-          pol=polyfit([-1:+1],ph(posmax-1:posmax+1),2);
+          pol=polyfit([-1:+1],ph(posmax-1:posmax+1),2); % parabolic fit of correlation peak
           if (valmax>std(ph)*stdthres)
-             solcor(p)=mod(t(posmax),1)-pol(2)/2/pol(1)*(t(2)-t(1));
+             solcor(p)=mod(t(posmax),1)-pol(2)/2/pol(1)*(t(2)-t(1)); % parabol maximum at -b/(2a)
              sol(p)=mod(t(posmax),1);
           end
         end

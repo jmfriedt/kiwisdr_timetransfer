@@ -1,4 +1,4 @@
-# Processing KiwiSDR datasets for assessing time and frequency transfer
+# Processing <img src="http://kiwisdr.com/.public/">KiwiSDR</a> datasets for assessing time and frequency transfer
 
 ## Compiling
 
@@ -11,23 +11,28 @@ mkoctfile read_kiwi_iq_wav.cc
 ## Installing
 
 The ``crontab`` should be tuned to call the recording script at the right 
-location, possibly also at better time.
+location, possibly also at better times: at the moment, set to every full and
+half hours.
 
 ## Results
 
 Three GNU/Octave scripts are used to process the DCF77 (77.5 kHz from 
 Mainflingen, Germany), ALS162 (162 kHz from Allouis, France) and LORAN 
-(100 kHz from Saudi-Arabia, recorded from Qatar).
+(100 kHz from Saudi-Arabia, recorded from Qatar). The first two scripts
+are mostly location independent, the LORAN-C dataset assumes GRI 8830
+(meaning the code repeats every 88.3 ms)
 
 ### ALS162
 
 Expected time of flight differences are estimated from the GPS positions
 of the emitters and receivers (see ``positions.txt``), assuming a speed 
-of light of 300 m/us:
+of light of 300 m/us (which is incorrect, see ASF correction for LORAN-C
+when the surface wave travels slower over ground):
 
 <img src="als162_map.png">
 
-ALS162 only provides a 0-crossing transition from +1 rad to -1 rad over 50 ms
+<a href="https://en.wikipedia.org/wiki/ALS162_time_signal">ALS162</a>
+only provides a 0-crossing transition from +1 rad to -1 rad over 50 ms
 to identify the beginning of the second:
 
 <img src="als162_1.png">
@@ -36,9 +41,10 @@ to identify the beginning of the second:
 
 ### DCF77
 
-Using the 512-chip long pseudo-random sequence phase modulation to improve the
-signal to noise ratio, spread the spectrum to achieve fine time of flight 
-measurement despite the low sampling rate of 12 kHz.
+Using the <a href="https://www.eecis.udel.edu/~mills/ntp/dcf77.html">512-chip long</a> 
+pseudo-random sequence phase modulation to improve the signal to noise ratio by spreading 
+the spectrum to achieve fine time of flight measurement despite the low sampling rate of 
+12 kHz.
 
 <img src="dcf77.png">
 
