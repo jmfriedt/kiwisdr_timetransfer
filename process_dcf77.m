@@ -93,6 +93,6 @@ ylim([202 207])
 figure
 plot(dt/3600,solmcor*1000)
 legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL','NUR','MUN')
-xlabel('GPS time (s)')
+xlabel('GPS time (h)')
 ylabel('delay with fit (ms)')
 ylim([202 207])

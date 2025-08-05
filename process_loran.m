@@ -104,7 +104,7 @@ dt=dt-dt(1);
 plot(dt/3600,solm*1000-1167)
 hold on
 plot(dt/3600,solf-1167)
-xlabel('GPS time (s)')
+xlabel('GPS time (h)')
 ylabel('delay (ms)')
 line([0 80],[0.1 0.1]+1000/fs)  % sampling period in ms
 line([0 80],[0.1 0.1]+2000/fs)
