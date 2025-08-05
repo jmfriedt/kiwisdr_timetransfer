@@ -63,7 +63,7 @@ LORAN C uses a Group Repetition Interval (GRI) in 10 us unit leading to a non-in
 copies of the code each second. For aligning, either decode the Z-counter to identify
 the code index within the sequence and hence the time offset, or here rely on the
 GPS timestamp to obtain a coarse time estimate from which the pulse position is deduced,
-knowing the GRI. Only th 8-pulses of the Master are considered, and averaged of 10 successive
+knowing the GRI. Only th 8-pulses of the Master are considered, and averaged of 40 successive
 copies
 
 <img src="loran_1.png">
