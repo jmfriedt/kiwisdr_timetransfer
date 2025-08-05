@@ -69,3 +69,8 @@ copies
 <img src="loran_1.png">
 
 <img src="loran_2.png">
+
+or on the same scale than the other charts
+
+<img src="loran_2samescale.png">
+
