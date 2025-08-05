@@ -43,13 +43,15 @@ for dirnum=1:length(dirname)
          subplot(511)
          plot(t(1:3*fs)-floor(t(1)),real(z(1:3*fs)));hold on
          plot(t(1:3*fs)-floor(t(1)),abs(z(1:3*fs)));
-         xlim([1 1.5])
+         xlim([1.15 1.27])
+         ylabel(dirname(dirnum).name)
       else
          if (dirnum<7)
             subplot(5,1,impos)
             plot(t(1:3*fs)-floor(t(1))+mod(((dt(dirnum)-dinit)/GRI/2),1)*GRI*2,real(z(1:3*fs)));hold on
             plot(t(1:3*fs)-floor(t(1))+mod(((dt(dirnum)-dinit)/GRI/2),1)*GRI*2,abs(z(1:3*fs)));
-            xlim([1 1.5])
+            xlim([1.15 1.27])
+            ylabel(dirname(dirnum).name)
             impos=impos+1;
          end
       end
