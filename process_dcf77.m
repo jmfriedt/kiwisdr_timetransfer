@@ -43,7 +43,7 @@ for dirnum=1:length(dirname)
   dlist=dir([dirname(dirnum).name,'/*77500*.wav']); % read all DCF77 records
   for l=1:length(dlist)
     [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
-    if ((isinf(fs)==0)&&(fs>10000))                 % check the file was interpreted correctly
+    if ((isempty(xx)==0)&&(isinf(fs)==0)&&(fs>10000))                 % check the file was interpreted correctly
       z=cat(1,xx.z);z=z(floor(fs/20):end);
       t=cat(1,xx.t);t=t(floor(fs/20):end);
       dt(dirnum)=floor(t(1));
@@ -85,14 +85,14 @@ figure
 k=find(dt>0);dt=dt(k);solm=solm(k,:);sols=sols(k,:);solmcor=solmcor(k,:);
 dt=dt-dt(1);
 dt=unwrap(dt/(86400*7)*2*pi)/2/pi*86400*7;
-plot(dt/3600,solm*1000)
-legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL','NUR','MUN')
+plot(dt/3600,solm*1000-202)
+legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL (2.26 ms)','NUR (0.86_7 ms)','MUN (0.87 ms)','location','eastoutside')
 xlabel('GPS time (s)')
 ylabel('delay (ms)')
-ylim([202 207])
+ylim([0 5])
 figure
-plot(dt/3600,solmcor*1000)
-legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL','NUR','MUN')
+plot(dt/3600,solmcor*1000-202)
+legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL (2.26 ms)','NUR (0.86_7 ms)','MUN (0.87 ms)','location','eastoutside')
 xlabel('GPS time (h)')
 ylabel('delay with fit (ms)')
-ylim([202 207])
+ylim([0 5])

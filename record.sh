@@ -1,6 +1,6 @@
 dir=`date +%s`
 killall python
-cd /home/jmfriedt/sdr/250801/kiwiclient/
+cd /home/jmfriedt/250801/kiwiclient/
 mkdir -p $dir
 ./kiwirecorder.py -d $dir  --station=G8U  --tlimit=10   -s g8ure.ddns.net  -p 8074 -f 162 -w -m iq  &
 ./kiwirecorder.py -d $dir  --station=G80  --tlimit=10   -s gw0kig.ddns.net -p 8073 -f 162 -w -m iq  &
@@ -25,3 +25,14 @@ mkdir -p $dir
 ./kiwirecorder.py -d $dir  --station=EID --tlimit=10   -s 188.213.88.46 -p 8073 -f 100 -w -m iq  &
 ./kiwirecorder.py -d $dir  --station=EID --tlimit=10   -s 188.213.88.46 -p 8073 -f 162 -w -m iq  &
 ./kiwirecorder.py -d $dir  --station=EID --tlimit=10   -s 188.213.88.46 -p 8073 -f 77.5 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=KR --tlimit=10   -s hl5ntr-sdr.ddns.net -p 8073 -f 100 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=PEN --tlimit=10   -s 86.162.57.67 -p 8073 -f 100 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=PEN --tlimit=10   -s 86.162.57.67 -p 8073 -f 162 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=PEN --tlimit=10   -s 86.162.57.67 -p 8073 -f 77.5 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=MUN --tlimit=10   -s 21897.proxy.kiwisdr.com -p 8073 -f 77.5 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=MUN --tlimit=10   -s 21897.proxy.kiwisdr.com -p 8073 -f 162 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=POL --tlimit=10   -s 87.251.229.127 -p 8073 -f 77.5 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=POL --tlimit=10   -s 87.251.229.127 -p 8073 -f 162 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=NUR --tlimit=10   -s sdr-bayern.spdns.de -p 8073 -f 77.5 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=NUR --tlimit=10   -s sdr-bayern.spdns.de -p 8073 -f 162 -w -m iq  &
+./kiwirecorder.py -d $dir  --station=NUR --tlimit=10   -s sdr-bayern.spdns.de -p 8073 -f 100 -w -m iq  &

@@ -29,12 +29,12 @@ for dirnum=1:length(dirname)
   dlist=dir([dirname(dirnum).name,'/*162*wav']); % all ALS162 records
   for l=1:length(dlist)
     [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
-    if ((isinf(fs)==0)&&(fs>8000))               % check the file was interpreted correctly
+    if ((isempty(xx)==0)&&(isinf(fs)==0)&&(fs>8000))               % check the file was interpreted correctly
       z=cat(1,xx.z);z=z(floor(fs/20):end);       % IQ
       t=cat(1,xx.t);t=t(floor(fs/20):end);       % time
       dt(dirnum)=floor(t(1));                    % first integer GNSS timestamp second
       sol=[];
-      for p=1:8
+      for p=1:9
         if ((p==1)&&(dirnum==1)&&(l==2))
           figure
           subplot(311);plot(t(1:3*fs)-floor(t(1)),abs(z(1:3*fs)));hold on;xlabel('time (s)');ylabel('|I+jQ| (a.u.)');
@@ -62,7 +62,7 @@ for dirnum=1:length(dirname)
               end
               if ((dirnum==1)&&(p<4)&&(l==2))
                 subplot(312);
-                line([(p-1)+sol(p) (p-1)+sol(p)],[-0.5 0.5],'linewidth',2)
+                line([(p)+sol(p) (p)+sol(p)],[-0.5 0.5],'linewidth',2)
               end
             end
           end
@@ -97,7 +97,7 @@ k=find(dt>0);dt=dt(k);solm=solm(k,:);sols=sols(k,:);
 dt=dt-dt(1);
 dt=unwrap(dt/(86400*7)*2*pi)/2/pi*86400*7;
 plot(dt/3600,solm*1000)
-legend('ON5 (1.36 ms)','ECH (0.39 ms)','FR (0.92 ms)','G80 (2.16 ms)','G8U (1.54 ms)','ZAP (1.77 ms)','POL','NUR','MUN')
+legend('ON5 (1.36 ms)','ECH (0.39 ms)','FR (0.92 ms)','G80 (2.16 ms)','G8U (1.54 ms)','ZAP (1.77 ms)','POL','NUR (2.65 ms)','MUN (2.29 ms)','location','eastoutside')
 xlabel('GPS time (h)')
 ylabel('delay (ms)')
 ylim([0 5])
