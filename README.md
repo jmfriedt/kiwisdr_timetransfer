@@ -74,3 +74,10 @@ or on the same scale than the other charts
 
 <img src="loran_2samescale.png">
 
+### eLORAN
+
+Quick assessment that the +/-1 $\mu$s PPM modulation is visible as +/-36 degree phase shift 
+of the 10 $\mu$s period signal, meaning the bit detection is possible despite the low
+sampling rate of the KiwiSDR.
+
+<img src="eloran_PEN_phase.png">
