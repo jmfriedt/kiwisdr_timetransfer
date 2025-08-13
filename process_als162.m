@@ -23,12 +23,14 @@ addpath('./kiwiclient')
 
 # liste : http://kiwisdr.com/.public/
 
-dirname=dir('175*');         % directoty names index by Unix epoch
+location='kiwiclient/';
+
+dirname=dir([location,'/175*']);         % directoty names index by Unix epoch
 for dirnum=1:length(dirname)
   dirname(dirnum).name
-  dlist=dir([dirname(dirnum).name,'/*162*wav']); % all ALS162 records
+  dlist=dir([location,dirname(dirnum).name,'/*162*wav']); % all ALS162 records
   for l=1:length(dlist)
-    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
+    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([location,dirname(dirnum).name,'/',dlist(l).name]);
     if ((isempty(xx)==0)&&(isinf(fs)==0)&&(fs>8000))               % check the file was interpreted correctly
       z=cat(1,xx.z);z=z(floor(fs/20):end);       % IQ
       t=cat(1,xx.t);t=t(floor(fs/20):end);       % time

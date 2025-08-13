@@ -24,38 +24,39 @@ pkg load nan
 
 # liste : http://kiwisdr.com/.public/
 
-location='kiwiclient/';
-
 GRI=8830*10/1E6      % GRI*10 us repetition period
-dirname=dir([location,'175*']); % '1754040062';
+dirname=dir('175*'); % '1754040062';
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
 impos=2;
 pmax=8;              % pulses
 for dirnum=1:length(dirname)
   dirname(dirnum).name
-  dlist=dir([location,dirname(dirnum).name,'/*100000*QTR*wav']); % read LORAN records
+  dlist=dir([dirname(dirnum).name,'/*100000*PEN*wav']); % read eLORAN records
   for l=1:length(dlist)
-    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([location,dirname(dirnum).name,'/',dlist(l).name]);
-    if ((isempty(xx)==0)&&(isinf(fs)==0)&&(fs>10000))                 % check the file was interpreted correctly
+    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
+    if (isinf(fs)==0)
       z=cat(1,xx.z);z=z(floor(fs/20):end);
       t=cat(1,xx.t);t=t(floor(fs/20):end);
       dt(dirnum)=floor(t(1));
       if (exist('dinit')==0)
          dinit=dt(dirnum);
-         subplot(511)
-         plot(t(1:3*fs)-floor(t(1)),real(z(1:3*fs)));hold on
-         plot(t(1:3*fs)-floor(t(1)),abs(z(1:3*fs)));
-         xlim([1.15 1.27])
+         % subplot(511)
+         plot(t(1:3*fs)-floor(t(1)),180/pi*abs(z(1:3*fs)));
+         hold on
+         a=z(1:3*fs); 
+         k=find(abs(a)<(max(abs(a))/2.5));
+         a(k)=NaN;
+         plot(t(1:3*fs)-floor(t(1)),180/pi*angle(a));hold on
+%         xlim([1.15 1.27])
+         k=find(angle(a)>0);
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi)
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi+36)
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi-36)
+         k=find(angle(a)<0);
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi)
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi+36)
+         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi-36)
          ylabel(dirname(dirnum).name)
-      else
-         if (dirnum<7)
-            subplot(5,1,impos)
-            plot(t(1:3*fs)-floor(t(1))+mod(((dt(dirnum)-dinit)/GRI/2),1)*GRI*2,real(z(1:3*fs)));hold on
-            plot(t(1:3*fs)-floor(t(1))+mod(((dt(dirnum)-dinit)/GRI/2),1)*GRI*2,abs(z(1:3*fs)));
-            xlim([1.15 1.27])
-            ylabel(dirname(dirnum).name)
-            impos=impos+1;
-         end
       end
       if (dirnum>1)
         if dt(dirnum)+weeks*86400*7<dt(dirnum-1)  % unwrap GNSS timestamp (needed for GRI offset)
@@ -82,25 +83,13 @@ for dirnum=1:length(dirname)
       end
       printf("%s %s m=%f s=%f\n",dirname(dirnum).name,strrep(dlist(l).name(25:end),'_iq.wav',''),mean(sol),std(sol))
       kk=find(abs(sol)>0);
-      if (strfind(dlist(l).name,'ON5'));solm(dirnum,1)=mean(sol(kk));solf(dirnum,1)=mean(solfit(kk));sols(dirnum,1)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'EID'));solm(dirnum,2)=mean(sol(kk));solf(dirnum,2)=mean(solfit(kk));sols(dirnum,2)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'PEN'));solm(dirnum,3)=mean(sol(kk));solf(dirnum,3)=mean(solfit(kk));sols(dirnum,3)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'G8U'));solm(dirnum,4)=mean(sol(kk));solf(dirnum,4)=mean(solfit(kk));sols(dirnum,4)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'ZAP'));solm(dirnum,5)=mean(sol(kk));solf(dirnum,5)=mean(solfit(kk));sols(dirnum,5)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'KR')); solm(dirnum,6)=mean(sol(kk));solf(dirnum,6)=mean(solfit(kk));sols(dirnum,6)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'220'));solm(dirnum,7)=mean(sol(kk));solf(dirnum,7)=mean(solfit(kk));sols(dirnum,7)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'QTR'));solm(dirnum,8)=mean(sol(kk));solf(dirnum,8)=mean(solfit(kk));sols(dirnum,8)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'FR')); solm(dirnum,9)=mean(sol(kk));solf(dirnum,9)=mean(solfit(kk));sols(dirnum,9)=std(solfit(kk));end
-      if (strfind(dlist(l).name,'NUR'));solm(dirnum,10)=mean(sol(kk));solf(dirnum,10)=mean(solfit(kk));sols(dirnum,10)=std(solfit(kk));end
-    end
+      solm(dirnum)=mean(sol(kk));solf(dirnum)=mean(solfit(kk));sols(dirnum)=std(solfit(kk));end
   end
 end
-for k=1:size(solm)(2)
-   kk=find(solm(:,k)==0);solm(kk,k)=NaN;
-   kk=find(solf(:,k)==0);solf(kk,k)=NaN;
-   kk=find(abs(solm(:,k)-median(solm(:,k)))>.5e-3);solm(kk,k)=NaN;
-   kk=find(abs(solf(:,k)-median(solf(:,k)))>0.5);solf(kk,k)=NaN;
-end
+kk=find(solm==0);solm(kk)=NaN;
+kk=find(solf==0);solf(kk)=NaN;
+kk=find(abs(solm-median(solm))>.5e-3);solm(kk)=NaN;
+kk=find(abs(solf-median(solf))>0.5);solf(kk)=NaN;
 figure
 k=find(dt>0);dt=dt(k);solm=solm(k,:);solf=solf(k,:);
 dt=dt-dt(1);

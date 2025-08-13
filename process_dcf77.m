@@ -24,6 +24,8 @@ addpath('./kiwiclient')
 
 # liste : http://kiwisdr.com/.public/
 
+location='kiwiclient/';
+
 lfsr=load('dcf77_lfsr.dat');
 np=12000*(120/77500);       % PRN chip length (120 periods of carrier)
 oldP=0;
@@ -37,12 +39,12 @@ end
 longlfsr=longlfsr-mean(longlfsr); % correlation: subtract mean value
 
 stdthres=8;
-dirname=dir('175*'); % '1754040062';
+dirname=dir([location,'175*']); % '1754040062';
 for dirnum=1:length(dirname)
   dirname(dirnum).name
-  dlist=dir([dirname(dirnum).name,'/*77500*.wav']); % read all DCF77 records
+  dlist=dir([location,dirname(dirnum).name,'/*77500*.wav']); % read all DCF77 records
   for l=1:length(dlist)
-    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
+    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([location,dirname(dirnum).name,'/',dlist(l).name]);
     if ((isempty(xx)==0)&&(isinf(fs)==0)&&(fs>10000))                 % check the file was interpreted correctly
       z=cat(1,xx.z);z=z(floor(fs/20):end);
       t=cat(1,xx.t);t=t(floor(fs/20):end);
