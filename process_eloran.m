@@ -1,112 +1,224 @@
-clear all
 close all
-addpath('./kiwiclient')
-
 pkg load nan
-# sudo apt install octave-dev
-# mkoctfile read_kiwi_iq_wav.cc
-# ./kiwirecorder.py  -s g8ure.ddns.net  -p 8074 -f 162 -w -m iq
-# ./kiwirecorder.py  -s gw0kig.ddns.net -p 8073 -f 162 -w -m iq
-# ./kiwirecorder.py  -s kiwi.dg3sdk.de  -p 8073 -f 162 -w -m iq
-# ./kiwirecorder.py  -s echofox.fr      -p 8073 -f 162 -w -m iq
-# ./kiwirecorder.py  -s 22048.proxy.kiwisdr.com  -p 8073 -f 100 -w -m iq
-# ./kiwirecorder.py  -s g8ure.ddns.net  -p 8074 -f 100 -w -m iq
-# ./kiwirecorder.py  -s g8ure.ddns.net  -p 8074 -f 77.5 -w -m iq
-# ./kiwirecorder.py  -s sdr3.on5kq.be  -p 8075 -f 100 -w -m iq
-# ./kiwirecorder.py  -s sdr3.on5kq.be  -p 8075 -f 162 -w -m iq
-# ./kiwirecorder.py  -s sdr3.on5kq.be  -p 8075 -f 77.5 -w -m iq
-# ./kiwirecorder.py  -s wessex.zapto.org -p 8073 -f 77.5 -w -m iq
-# ./kiwirecorder.py  -s wessex.zapto.org -p 8073 -f 162 -w -m iq
-# ./kiwirecorder.py  -s wessex.zapto.org -p 8073 -f 100 -w -m iq
-# ./kiwirecorder.py  -s sdr.autreradioautreculture.com -p 8073 -f 100 -w -m iq
-# ./kiwirecorder.py  -s sdr.autreradioautreculture.com -p 8073 -f 162 -w -m iq
-# ./kiwirecorder.py  -s sdr.autreradioautreculture.com -p 8073 -f 77.5 -w -m iq
+displ=0              % display plots of intermediate processing steps
 
-# liste : http://kiwisdr.com/.public/
-
-GRI=8830*10/1E6      % GRI*10 us repetition period
-dirname=dir('175*'); % '1754040062';
+GRI=6731*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
 impos=2;
 pmax=8;              % pulses
-for dirnum=1:length(dirname)
-  dirname(dirnum).name
-  dlist=dir([dirname(dirnum).name,'/*100000*PEN*wav']); % read eLORAN records
-  for l=1:length(dlist)
-    [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav([dirname(dirnum).name,'/',dlist(l).name]);
-    if (isinf(fs)==0)
-      z=cat(1,xx.z);z=z(floor(fs/20):end);
-      t=cat(1,xx.t);t=t(floor(fs/20):end);
-      dt(dirnum)=floor(t(1));
-      if (exist('dinit')==0)
-         dinit=dt(dirnum);
-         % subplot(511)
-         plot(t(1:3*fs)-floor(t(1)),180/pi*abs(z(1:3*fs)));
+dlist=dir('*wav');   % read eLORAN records
+pattern=[[-1 -1  0  0 +1 +1]; % 0
+         [-1 -1  0 +1  0 +1]; % 1
+         [-1 -1  0 +1 +1  0]; % 2
+         [-1 -1 +1  0  0 +1]; % 3
+         [-1 -1 +1  0 +1  0]; % 4
+         [-1 -1 +1 +1  0  0]; % 5
+         [-1  0 -1  0 +1 +1]; % 6
+         [-1  0 -1 +1  0 +1]; % 7
+         [-1  0 -1 +1 +1  0]; % 8
+         [-1  0  0 -1 +1 +1]; % 9
+         [-1  0  0 +1 -1 +1]; % 10
+         [-1  0  0 +1 +1 -1]; % 11
+         [-1  0 +1 -1  0 +1]; % 12
+         [-1  0 +1 -1 +1  0]; % 13
+         [-1  0 +1  0 -1 +1]; % 14
+         [-1  0 +1  0 +1 -1]; % 15
+         [-1  0 +1 +1 -1  0]; % 16
+         [-1  0 +1 +1  0 -1]; % 17
+         [-1 +1 -1  0  0 +1]; % 18
+         [-1 +1 -1  0 +1  0]; % 19
+         [-1 +1 -1 +1  0  0]; % 20
+         [-1 +1  0 -1  0 +1]; % 21
+         [-1 +1  0 -1 +1  0]; % 22
+         [-1 +1  0  0 -1 +1]; % 23
+         [-1 +1  0  0 +1 -1]; % 24
+         [-1 +1  0 +1 -1  0]; % 25
+         [-1 +1  0 +1  0 -1]; % 26
+         [-1 +1 +1 -1  0  0]; % 27
+         [-1 +1 +1  0 -1  0]; % 28
+         [-1 +1 +1  0  0 -1]; % 29
+         [ 0 -1 -1  0 +1 +1]; % 30
+         [ 0 -1 -1 +1  0 +1]; % 31
+         [ 0 -1 -1 +1 +1  0]; % 32
+         [ 0 -1  0 -1 +1 +1]; % 33
+         [ 0 -1  0 +1 -1 +1]; % 34
+         [ 0 -1  0 +1 +1 -1]; % 35
+         [ 0 -1 +1 -1  0 +1]; % 36
+         [ 0 -1 +1 -1 +1  0]; % 37
+         [ 0 -1 +1  0 -1 +1]; % 38
+         [ 0 -1 +1  0 +1 -1]; % 39
+         [ 0 -1 +1 +1 -1  0]; % 40
+         [ 0 -1 +1 +1  0 -1]; % 41
+         [ 0  0 -1 -1 +1 +1]; % 42
+         [ 0  0 -1 +1 -1 +1]; % 43
+         [ 0  0 -1 +1 +1 -1]; % 44
+         [ 0  0 +1 -1 -1 +1]; % 45
+         [ 0  0 +1 -1 +1 -1]; % 46
+         [ 0  0 +1 +1 -1 -1]; % 47
+         [ 0 +1 -1 -1  0 +1]; % 48
+         [ 0 +1 -1 -1 +1  0]; % 49
+         [ 0 +1 -1  0 -1 +1]; % 50
+         [ 0 +1 -1  0 +1 -1]; % 51
+         [ 0 +1 -1 +1 -1  0]; % 52
+         [ 0 +1 -1 +1  0 -1]; % 53
+         [ 0 +1  0 -1 -1 +1]; % 54
+         [ 0 +1  0 -1 +1 -1]; % 55
+         [ 0 +1  0 +1 -1 -1]; % 56
+         [ 0 +1 +1 -1 -1  0]; % 57
+         [ 0 +1 +1 -1  0 -1]; % 58
+         [ 0 +1 +1  0 -1 -1];
+         [+1 -1 -1  0  0 +1];
+         [+1 -1 -1  0 +1  0];
+         [+1 -1 -1 +1  0  0];
+         [+1 -1  0 -1  0 +1];
+         [+1 -1  0 -1 +1  0];
+         [+1 -1  0  0 -1 +1];
+         [+1 -1  0  0 +1 -1];
+         [+1 -1  0 +1 -1  0];
+         [+1 -1  0 +1  0 -1];
+         [+1 -1 +1 -1  0  0];
+         [+1 -1 +1  0 -1  0];
+         [+1 -1 +1  0  0 -1];
+         [+1  0 -1 -1  0 +1];
+         [+1  0 -1 -1 +1  0];
+         [+1  0 -1  0 -1 +1];
+         [+1  0 -1  0 +1 -1];
+         [+1  0 -1 +1 -1  0];
+         [+1  0 -1 +1  0 -1];
+         [+1  0  0 -1 -1 +1];
+         [+1  0  0 -1 +1 -1];
+         [+1  0  0 +1 -1 -1];
+         [+1  0 +1 -1 -1  0];
+         [+1  0 +1 -1  0 -1];
+         [+1  0 +1  0 -1 -1];
+         [+1 +1 -1 -1  0  0];
+         [+1 +1 -1  0 -1  0];
+         [+1 +1 -1  0  0 -1];
+         [+1 +1  0 -1 -1  0];
+         [+1 +1  0 -1  0 -1];
+         [+1 +1  0  0 -1 -1];
+         [-1  0  0  0  0 +1];
+         [-1  0  0  0 +1  0];
+         [-1  0  0 +1  0  0];
+         [-1  0 +1  0  0  0];
+         [-1 +1  0  0  0  0];
+         [ 0 -1  0  0  0 +1];
+         [ 0 -1  0  0 +1  0];
+         [ 0 -1  0 +1  0  0];
+         [ 0 -1 +1  0  0  0];
+         [ 0  0 -1  0  0 +1];
+         [ 0  0 -1  0 +1  0];
+         [ 0  0 -1 +1  0  0];
+         [ 0  0  0 -1  0 +1];
+         [ 0  0  0 -1 +1  0];
+         [ 0  0  0  0 -1 +1];
+         [ 0  0  0  0 +1 -1];
+         [ 0  0  0 +1 -1  0];
+         [ 0  0  0 +1  0 -1];
+         [ 0  0 +1 -1  0  0];
+         [ 0  0 +1  0 -1  0];
+         [ 0  0 +1  0  0 -1];
+         [ 0 +1 -1  0  0  0];
+         [ 0 +1  0 -1  0  0];
+         [ 0 +1  0  0 -1  0];
+         [ 0 +1  0  0  0 -1];
+         [+1 -1  0  0  0  0];
+         [+1  0 -1  0  0  0];
+         [+1  0  0 -1  0  0];
+         [+1  0  0  0 -1  0];
+         [+1 -1 +1 -1 +1 -1];
+         [-1 +1 -1 +1 -1 +1];
+         [+1 -1 +1 -1 -1 +1];
+         [-1 +1 -1 +1 +1 -1];
+         [+1 -1 -1 +1 -1 +1];
+         [-1 +1 +1 -1 +1 -1];
+         [+1 -1 -1 +1 +1 -1];
+         [-1 +1 +1 -1 -1 +1];
+         [+1  0  0  0  0 -1];
+        ];
+for l=1:length(dlist)
+  if (exist('x')==0)
+     [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);
+  end
+  if (isinf(fs)==0)
+     z=cat(1,xx.z);z=z(floor(fs/20):end);z50ms=z(1:floor(fs/20));
+     t=cat(1,xx.t);t=t(floor(fs/20):end);t=t-t(1);t50ms=t(1:floor(fs/20));
+% plot the magnitude
+     if (displ!=0)
+        subplot(211)
+        plot(t50ms,abs(z50ms))
+     end
+     kmag=find(abs(z50ms)<(max(abs(z50ms))/2.5));
+     z50ms(kmag)=NaN;
+% plot the phases
+     subplot(212)
+     plot(t50ms,180/pi*angle(z50ms));hold on
+     k=find(angle(z50ms)>0);
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
+     k=find(angle(z50ms)<0);
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
+     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
+
+     dk=round(1e-3*fs);
+     kinit=1;
+     do 
+       if (displ!=0)
+         figure
+         subplot(311);
+         plot(abs(z(kinit:kinit+5*GRI*fs-1)))
+       end
+       kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/2.5); 
+       kinit=kinit-1+kinittmp(1)-floor(dk/2);
+       tinit=t(kinit);
+       tstop=tinit+11*1e-3;  % 1 ms spacing x 9 bits with last spaced by 2 ms
+       kstop=find(t>=tstop);kstop=kstop(1);
+       zuseful=z(kinit:kstop);
+       if (displ!=0)
+         subplot(312); plot(abs(zuseful));
+       end
+                              % threshold amplitude and detect phase and amplitude maxima
+       k=find(abs(zuseful)>max(abs(zuseful))/2.5); k=k(1);
+       clear pos ph
+       for m=1:9
+          if (m<=8)
+            [~,pos(m)]=max(abs(zuseful(k+(m-1)*dk:k+m*dk-dk/2)));  % do not go too far over next bit
+            pos(m)=pos(m)+k+(m-1)*dk-1;
+          else
+            [val,tmppos]=max(abs(zuseful(k+(m)*dk:end)));
+            if (val>max(abs(zuseful)/2.5))
+               pos(m)=tmppos+k+m*dk-1;
+            end
+          end
+       end
+       ph=arg(zuseful(pos));
+       kinit=kstop+dk;
+       if (displ!=0)
+         subplot(313); plot(pos,ph,'ro');xlim([0 140])
+       end
+       kphasepos=find(ph>0);
+       kphaseneg=find(ph<=0); % first find all the positive and negative and THEN shift
+       ph(kphaseneg)+=pi/2;
+       ph(kphasepos)-=pi/2;
+       bit=zeros(length(ph),1);
+       ph0=mean(ph(1:2));     % identify coarse phase (+/-)
+       if (displ!=0)
          hold on
-         a=z(1:3*fs); 
-         k=find(abs(a)<(max(abs(a))/2.5));
-         a(k)=NaN;
-         plot(t(1:3*fs)-floor(t(1)),180/pi*angle(a));hold on
-%         xlim([1.15 1.27])
-         k=find(angle(a)>0);
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi)
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi+36)
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi-36)
-         k=find(angle(a)<0);
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi)
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi+36)
-         line([min(t(1:3*fs)-floor(t(1))) max(t(1:3*fs)-floor(t(1)))],[mean(angle(a(k))) mean(angle(a(k)))]*180/pi-36)
-         ylabel(dirname(dirnum).name)
-      end
-      if (dirnum>1)
-        if dt(dirnum)+weeks*86400*7<dt(dirnum-1)  % unwrap GNSS timestamp (needed for GRI offset)
-           weeks=weeks+1;
-        end
-      end
-      dt(dirnum)=dt(dirnum)+weeks*86400*7;
-      loran_mag=abs(z);
-      loran_time=t-floor(t(1))+mod(((dt(dirnum)-dinit)/GRI/2),1)*GRI*2; % every 2*GRI for master pulses
-      kinit=find(loran_time>1.16);kinit=kinit(1);
-      kstop=find(loran_time>1.20);kstop=kstop(1);
-      k=find(loran_mag(kinit:kstop)>max(loran_mag(kinit:kstop))/2);k=k(1)+kinit-1; % first pulse detection
-      if (isempty(k)==0)
-        for griindex=0:40                                    % 40 bursts of 8 pulses *2 GRI (every 88.3*2 ms=7 s) 
-           for p=1:pmax                                      % 8 pulses
-             burstindex=floor(griindex*GRI*2*fs)+(p-1)*12;   % 12 = 1 ms @ 12 kS/s
-             [~,posmax]=max(loran_mag(k-3+burstindex:k+3+burstindex));posmax=posmax-1+(k-3)+burstindex;  
-             sol(p+(griindex)*pmax)=loran_time(posmax)-burstindex*(t(2)-t(1));
-             pol=polyfit(1000*(loran_time(posmax-1:posmax+1)-loran_time(posmax)),loran_mag(posmax-1:posmax+1),2);
-             solfit(p+(griindex)*pmax)=1000*loran_time(posmax)-(pol(2)/2/pol(1))-burstindex*1000*(t(2)-t(1));
-           end                   % ^^^ align all bursts knowing the burst index from the GNSS timestamp
-        end
-        % if (sol<1.165) figure;plot(loran_time(kinit:kstop),loran_mag(kinit:kstop));hold on;pause;end
-      end
-      printf("%s %s m=%f s=%f\n",dirname(dirnum).name,strrep(dlist(l).name(25:end),'_iq.wav',''),mean(sol),std(sol))
-      kk=find(abs(sol)>0);
-      solm(dirnum)=mean(sol(kk));solf(dirnum)=mean(solfit(kk));sols(dirnum)=std(solfit(kk));end
+         subplot(313); plot(pos,ph,'bx');xlim([0 140])
+         line([0 140],[ph0+36/180/2 ph0+36/180/2])
+         line([0 140],[ph0-36/180/2 ph0-36/180/2])
+       end
+                              % identify fine phase (+ with +/-36 degrees for 0/-1/+1 or - with +/-36 degrees)
+       khard=find(ph>ph0+36/180/2*1.5);bit(khard)=1; % soft bit to hard bit threshold: 
+       khard=find(ph<ph0-36/180/2*1.5);bit(khard)=-1;
+%       bit'                  % here we have 1 frame with 8 or 9 bits
+       if (sum(bit(3:8))!=0) printf("error\n");end
+       [~,res]=ismember(bit(3:8)',pattern,'rows');   % concatenate hard bits into symbol
+       if (res>0)
+          res=res-1 % bits to byte
+       end
+     until (kinit>length(z))                         % repeat for next fram of 8 or 9 bits
   end
 end
-kk=find(solm==0);solm(kk)=NaN;
-kk=find(solf==0);solf(kk)=NaN;
-kk=find(abs(solm-median(solm))>.5e-3);solm(kk)=NaN;
-kk=find(abs(solf-median(solf))>0.5);solf(kk)=NaN;
-figure
-k=find(dt>0);dt=dt(k);solm=solm(k,:);solf=solf(k,:);
-dt=dt-dt(1);
-% dt=unwrap(dt/(86400*7)*2*pi)/2/pi*86400*7;
-plot(dt/3600,solm*1000-1167)
-hold on
-plot(dt/3600,solf-1167)
-xlabel('GPS time (h)')
-ylabel('delay (ms)')
-line([0 80],[0.1 0.1]+1000/fs)  % sampling period in ms
-line([0 80],[0.1 0.1]+2000/fs)
-figure
-plot(dt/3600,solm*1000-1167)
-hold on
-plot(dt/3600,solf-1167)
-xlabel('GPS time (h)')
-ylabel('delay (ms)')
-line([0 80],[0.1 0.1]+1000/fs)  % sampling period in ms
-line([0 80],[0.1 0.1]+2000/fs)
-ylim([0 5])
