@@ -81,3 +81,6 @@ of the 10 $\mu$s period signal, meaning the bit detection is possible despite th
 sampling rate of the KiwiSDR.
 
 <img src="eloran_PEN_phase.png">
+
+As stated at <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109988.html">this
+time-nuts</a> mailing list archive, the digital communication protocol is described at https://www.itu.int/rec/R-REC-M.589/_page.print
