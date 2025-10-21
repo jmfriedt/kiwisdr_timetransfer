@@ -202,6 +202,19 @@ for l=1:length(dlist)
        kphaseneg=find(ph<=0); % first find all the positive and negative and THEN shift
        ph(kphaseneg)+=pi/2;
        ph(kphasepos)-=pi/2;
+       master=0;
+       secondary=0;
+% GRI-A
+       if ((length(kphasepos)==4) && (ismember(kphasepos',[3 4 6 8],'rows')==1) && (length(kphaseneg)==5) && (ismember(kphaseneg',[1 2 5 7 9],'rows')==1)) master=1;end
+       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 2 3 4 5 8],'rows')==1) && (length(kphaseneg)==2) && (ismember(kphaseneg',[6 7],'rows')==1)) secondary=1;end
+       if ((length(kphaseneg)==4) && (ismember(kphaseneg',[3 4 6 8],'rows')==1) && (length(kphasepos)==5) && (ismember(kphasepos',[1 2 5 7 9],'rows')==1)) master=-1;end
+       if ((length(kphaseneg)==6) && (ismember(kphaseneg',[1 2 3 4 5 8],'rows')==1) && (length(kphasepos)==2) && (ismember(kphasepos',[6 7],'rows')==1)) secondary=-1;end
+% GRI-B
+       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 4 5 6 7 8],'rows')==1) && (length(kphaseneg)==3) && (ismember(kphaseneg',[2 3 9],'rows')==1)) master=2;end
+       if ((length(kphasepos)==4) && (ismember(kphasepos',[1 3 5 6],'rows')==1) && (length(kphaseneg)==4) && (ismember(kphaseneg',[2 4  7 8],'rows')==1)) secondary=2;end
+       if ((length(kphaseneg)==6) && (ismember(kphaseneg',[1 4 5 6 7 8],'rows')==1) && (length(kphasepos)==3) && (ismember(kphasepos',[2 3 9],'rows')==1)) master=-2;end
+       if ((length(kphaseneg)==4) && (ismember(kphaseneg',[1 3 5 6],'rows')==1) && (length(kphasepos)==4) && (ismember(kphasepos',[2 4  7 8],'rows')==1)) secondary=-2;end
+
        bit=zeros(length(ph),1);
        ph0=mean(ph(1:2));     % identify coarse phase (+/-)
        if (displ!=0)
@@ -217,8 +230,20 @@ for l=1:length(dlist)
        if (sum(bit(3:8))!=0) printf("error\n");end
        [~,res]=ismember(bit(3:8)',pattern,'rows');   % concatenate hard bits into symbol
        if (res>0)
-          res=res-1 % bits to byte
+          res=res-1; % bits to byte
        end
+       if (master==1)     printf("+master:    %d\n",res);end
+       if (secondary==1)  printf("+secondary: %d\n",res);end
+       if (master==-1)    printf("-master:    %d\n",res);end
+       if (secondary==-1) printf("-secondary: %d\n",res);end
+       if (master==2)     printf("+Master:    %d\n",res);end
+       if (secondary==2)  printf("+Secondary: %d\n",res);end
+       if (master==-2)    printf("-Master:    %d\n",res);end
+       if (secondary==-2) printf("-Secondary: %d\n",res);end
+       if (master==0) && (secondary==0) printf("none\n");
+kphasepos'
+kphaseneg'
+end
      until (kinit>length(z))                         % repeat for next fram of 8 or 9 bits
   end
 end
