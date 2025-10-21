@@ -1,3 +1,10 @@
+% Questions:
+% why all master signals are unmodulated?
+% beginning of sentence when assembling bits?
+% how to handle missing secondary sequence (erroneous decoding?)
+
+% 70 bit data including 14 bit CRC followed by 140 bit RS = 210 bit frame
+
 close all
 pkg load nan
 displ=0              % display plots of intermediate processing steps
@@ -151,19 +158,22 @@ for l=1:length(dlist)
      kmag=find(abs(z50ms)<(max(abs(z50ms))/2.5));
      z50ms(kmag)=NaN;
 % plot the phases
-     subplot(212)
-     plot(t50ms,180/pi*angle(z50ms));hold on
-     k=find(angle(z50ms)>0);
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
-     k=find(angle(z50ms)<0);
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
-     line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
+     if (displ!=0)
+        subplot(212)
+        plot(t50ms,180/pi*angle(z50ms));hold on
+        k=find(angle(z50ms)>0);
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
+        k=find(angle(z50ms)<0);
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
+        line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
+     end
 
-     dk=round(1e-3*fs);
+     dk=round(1e-3*fs);  % samples in 1 ms (duration of each burst)
      kinit=1;
+     binres=[];
      do 
        if (displ!=0)
          figure
@@ -205,9 +215,9 @@ for l=1:length(dlist)
        master=0;
        secondary=0;
 % GRI-A
-       if ((length(kphasepos)==4) && (ismember(kphasepos',[3 4 6 8],'rows')==1) && (length(kphaseneg)==5) && (ismember(kphaseneg',[1 2 5 7 9],'rows')==1)) master=1;end
+       if ((length(kphasepos)==4) && (ismember(kphasepos',[3 4 6 8],'rows')==1) && (length(kphaseneg)==5) && (ismember(kphaseneg',[1 2 5 7 9],'rows')==1)) master=-1;end
        if ((length(kphasepos)==6) && (ismember(kphasepos',[1 2 3 4 5 8],'rows')==1) && (length(kphaseneg)==2) && (ismember(kphaseneg',[6 7],'rows')==1)) secondary=1;end
-       if ((length(kphaseneg)==4) && (ismember(kphaseneg',[3 4 6 8],'rows')==1) && (length(kphasepos)==5) && (ismember(kphasepos',[1 2 5 7 9],'rows')==1)) master=-1;end
+       if ((length(kphaseneg)==4) && (ismember(kphaseneg',[3 4 6 8],'rows')==1) && (length(kphasepos)==5) && (ismember(kphasepos',[1 2 5 7 9],'rows')==1)) master=+1;end
        if ((length(kphaseneg)==6) && (ismember(kphaseneg',[1 2 3 4 5 8],'rows')==1) && (length(kphasepos)==2) && (ismember(kphasepos',[6 7],'rows')==1)) secondary=-1;end
 % GRI-B
        if ((length(kphasepos)==6) && (ismember(kphasepos',[1 4 5 6 7 8],'rows')==1) && (length(kphaseneg)==3) && (ismember(kphaseneg',[2 3 9],'rows')==1)) master=2;end
@@ -238,7 +248,17 @@ for l=1:length(dlist)
        if (secondary==2)  printf("+secondaryB: ");end
        if (master==-2)    printf("-master   B: ");end
        if (secondary==-2) printf("-secondaryB: ");end
-       if (res>=0) printf("%d\n",res); else printf("\n");end
+       if (res>=0) 
+           printf("%d\n",res); 
+           for m=1:7
+              binres=[binres mod(res,2)];
+              res=floor(res/2);
+           end 
+           if (length(binres)>=210)
+               binres
+               binres=[];
+           end
+       else printf("\n");end
        if (master==0) && (secondary==0) printf("none\n");
           kphasepos'
           kphaseneg'
