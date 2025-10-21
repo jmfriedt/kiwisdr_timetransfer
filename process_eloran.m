@@ -229,21 +229,20 @@ for l=1:length(dlist)
 %       bit'                  % here we have 1 frame with 8 or 9 bits
        if (sum(bit(3:8))!=0) printf("error\n");end
        [~,res]=ismember(bit(3:8)',pattern,'rows');   % concatenate hard bits into symbol
-       if (res>0)
-          res=res-1; % bits to byte
-       end
-       if (master==1)     printf("+master:    %d\n",res);end
-       if (secondary==1)  printf("+secondary: %d\n",res);end
-       if (master==-1)    printf("-master:    %d\n",res);end
-       if (secondary==-1) printf("-secondary: %d\n",res);end
-       if (master==2)     printf("+Master:    %d\n",res);end
-       if (secondary==2)  printf("+Secondary: %d\n",res);end
-       if (master==-2)    printf("-Master:    %d\n",res);end
-       if (secondary==-2) printf("-Secondary: %d\n",res);end
+       res=res-1;                                    % bits (index) to byte   
+       if (master==1)     printf("+master   A: ");end
+       if (secondary==1)  printf("+secondaryA: ");end
+       if (master==-1)    printf("-master   A: ");end
+       if (secondary==-1) printf("-secondaryA: ");end
+       if (master==2)     printf("+master   B: ");end
+       if (secondary==2)  printf("+secondaryB: ");end
+       if (master==-2)    printf("-master   B: ");end
+       if (secondary==-2) printf("-secondaryB: ");end
+       if (res>=0) printf("%d\n",res); else printf("\n");end
        if (master==0) && (secondary==0) printf("none\n");
-kphasepos'
-kphaseneg'
-end
+          kphasepos'
+          kphaseneg'
+       end
      until (kinit>length(z))                         % repeat for next fram of 8 or 9 bits
   end
 end
