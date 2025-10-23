@@ -9,6 +9,40 @@ close all
 pkg load nan
 displ=0              % display plots of intermediate processing steps
 
+% https://fr.mathworks.com/help/matlab/matlab_prog/perform-cyclic-redundancy-check.html
+message = [1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0];
+divisor = [1, 1, 1, 1];
+divisorDegree = 3; % must return 110
+% https://ww1.microchip.com/downloads/en/appnotes/00730a.pdf
+%message = [0, 1, 1, 0, 1, 0, 1];
+%divisor = [1, 0, 1];
+%divisorDegree = 2; % must return 11
+
+message = ([0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1]);
+divisor = ([1 0 1 0 0 1 1 1]);
+divisorDegree = 8;
+
+% CRC definition in ITU-R M.589-3 page 13 section 4.5
+%divisor=[1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1];
+%divisorDegree=14;
+
+function res=calcCRC(message, divisor, divisorDegree)
+  BufferInit = zeros(1,divisorDegree);
+  Input = [ message  zeros(1,divisorDegree)];
+  for i = 1:length(Input)
+    temp1 = BufferInit(end);
+    temp2 = temp1*divisor;
+    for j = length(BufferInit):-1:2
+      BufferInit(j) = xor(temp2(j), BufferInit(j-1));
+    end
+    BufferInit(1) = xor(Input(i), temp2(1));
+  end
+  res=fliplr(BufferInit);
+end
+
+calcCRC(message,divisor,divisorDegree)
+fini
+
 GRI=6731*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
 impos=2;
@@ -251,11 +285,17 @@ for l=1:length(dlist)
        if (res>=0) 
            printf("%d\n",res); 
            for m=1:7
-              binres=[binres mod(res,2)];
+              binres=[mod(res,2) binres];  % least significant bit to the right
               res=floor(res/2);
            end 
            if (length(binres)>=210)
                binres
+               for m=divisorDegree+1:length(binres)
+                  message=eval(['u=0b',sprintf("%d",binres(m:m+57)),'u64';]);
+                  messagecrc=eval(['u=0b',sprintf("%d",binres(m-divisorDegree:m)),'u64';]);
+                  evalcrc=CRC_check_value=calculate_CRC(message,messageLength,divisor,divisorDegree);
+fini
+               end
                binres=[];
            end
        else printf("\n");end
