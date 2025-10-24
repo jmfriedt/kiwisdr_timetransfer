@@ -10,21 +10,17 @@ pkg load nan
 displ=0              % display plots of intermediate processing steps
 
 % https://fr.mathworks.com/help/matlab/matlab_prog/perform-cyclic-redundancy-check.html
-message = [1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0];
-divisor = [1, 1, 1, 1];
-divisorDegree = 3; % must return 110
+%message = [1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0];
+%divisor = [1, 1, 1, 1];
+%divisorDegree = 3; % must return 110
 % https://ww1.microchip.com/downloads/en/appnotes/00730a.pdf
 %message = [0, 1, 1, 0, 1, 0, 1];
 %divisor = [1, 0, 1];
 %divisorDegree = 2; % must return 11
 
-message = ([0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1]);
-divisor = ([1 0 1 0 0 1 1 1]);
-divisorDegree = 8;
-
 % CRC definition in ITU-R M.589-3 page 13 section 4.5
-%divisor=[1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1];
-%divisorDegree=14;
+divisor = ([1 1 0 0 0 0 0 1 0 1 1 0 0 0 1]);
+divisorDegree = 14;
 
 function res=calcCRC(message, divisor, divisorDegree)
   BufferInit = zeros(1,divisorDegree);
@@ -39,9 +35,6 @@ function res=calcCRC(message, divisor, divisorDegree)
   end
   res=fliplr(BufferInit);
 end
-
-calcCRC(message,divisor,divisorDegree)
-fini
 
 GRI=6731*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
@@ -249,15 +242,27 @@ for l=1:length(dlist)
        master=0;
        secondary=0;
 % GRI-A
-       if ((length(kphasepos)==4) && (ismember(kphasepos',[3 4 6 8],'rows')==1) && (length(kphaseneg)==5) && (ismember(kphaseneg',[1 2 5 7 9],'rows')==1)) master=-1;end
-       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 2 3 4 5 8],'rows')==1) && (length(kphaseneg)==2) && (ismember(kphaseneg',[6 7],'rows')==1)) secondary=1;end
        if ((length(kphaseneg)==4) && (ismember(kphaseneg',[3 4 6 8],'rows')==1) && (length(kphasepos)==5) && (ismember(kphasepos',[1 2 5 7 9],'rows')==1)) master=+1;end
+       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 2 3 4 5 8],'rows')==1) && (length(kphaseneg)==2) && (ismember(kphaseneg',[6 7],'rows')==1)) secondary=+1;end
+       if ((length(kphasepos)==4) && (ismember(kphasepos',[3 4 6 8],'rows')==1) && (length(kphaseneg)==5) && (ismember(kphaseneg',[1 2 5 7 9],'rows')==1)) master=-1;end
        if ((length(kphaseneg)==6) && (ismember(kphaseneg',[1 2 3 4 5 8],'rows')==1) && (length(kphasepos)==2) && (ismember(kphasepos',[6 7],'rows')==1)) secondary=-1;end
 % GRI-B
-       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 4 5 6 7 8],'rows')==1) && (length(kphaseneg)==3) && (ismember(kphaseneg',[2 3 9],'rows')==1)) master=2;end
-       if ((length(kphasepos)==4) && (ismember(kphasepos',[1 3 5 6],'rows')==1) && (length(kphaseneg)==4) && (ismember(kphaseneg',[2 4  7 8],'rows')==1)) secondary=2;end
+       if ((length(kphasepos)==6) && (ismember(kphasepos',[1 4 5 6 7 8],'rows')==1) && (length(kphaseneg)==3) && (ismember(kphaseneg',[2 3 9],'rows')==1)) master=+2;end
+       if ((length(kphasepos)==4) && (ismember(kphasepos',[1 3 5 6],'rows')==1) && (length(kphaseneg)==4) && (ismember(kphaseneg',[2 4  7 8],'rows')==1)) secondary=+2;end
        if ((length(kphaseneg)==6) && (ismember(kphaseneg',[1 4 5 6 7 8],'rows')==1) && (length(kphasepos)==3) && (ismember(kphasepos',[2 3 9],'rows')==1)) master=-2;end
        if ((length(kphaseneg)==4) && (ismember(kphaseneg',[1 3 5 6],'rows')==1) && (length(kphasepos)==4) && (ismember(kphasepos',[2 4  7 8],'rows')==1)) secondary=-2;end
+       if (master==1)     printf("+master   A: ");end
+       if (secondary==1)  printf("+secondaryA: ");end
+       if (master==-1)    printf("-master   A: ");end
+       if (secondary==-1) printf("-secondaryA: ");end
+       if (master==2)     printf("+master   B: ");end
+       if (secondary==2)  printf("+secondaryB: ");end
+       if (master==-2)    printf("-master   B: ");end
+       if (secondary==-2) printf("-secondaryB: ");end
+       if (master==0) && (secondary==0) printf("none\n");
+          kphasepos'
+          kphaseneg'
+       end
 
        bit=zeros(length(ph),1);
        ph0=mean(ph(1:2));     % identify coarse phase (+/-)
@@ -271,38 +276,34 @@ for l=1:length(dlist)
        khard=find(ph>ph0+36/180/2*1.5);bit(khard)=1; % soft bit to hard bit threshold: 
        khard=find(ph<ph0-36/180/2*1.5);bit(khard)=-1;
 %       bit'                  % here we have 1 frame with 8 or 9 bits
-       if (sum(bit(3:8))!=0) printf("error\n");end
+       if (sum(bit(3:8))!=0) printf("error ");end
        [~,res]=ismember(bit(3:8)',pattern,'rows');   % concatenate hard bits into symbol
        res=res-1;                                    % bits (index) to byte   
-       if (master==1)     printf("+master   A: ");end
-       if (secondary==1)  printf("+secondaryA: ");end
-       if (master==-1)    printf("-master   A: ");end
-       if (secondary==-1) printf("-secondaryA: ");end
-       if (master==2)     printf("+master   B: ");end
-       if (secondary==2)  printf("+secondaryB: ");end
-       if (master==-2)    printf("-master   B: ");end
-       if (secondary==-2) printf("-secondaryB: ");end
-       if (res>=0) 
-           printf("%d\n",res); 
+       printf("%d\n",res); 
+       if (res>=0)
+           newbits=[];
            for m=1:7
-              binres=[mod(res,2) binres];  % least significant bit to the right
+              newbits=[mod(res,2) newbits];  % least significant bit to the right
               res=floor(res/2);
            end 
-           if (length(binres)>=210)
-               binres
-               for m=divisorDegree+1:length(binres)
-                  message=eval(['u=0b',sprintf("%d",binres(m:m+57)),'u64';]);
-                  messagecrc=eval(['u=0b',sprintf("%d",binres(m-divisorDegree:m)),'u64';]);
-                  evalcrc=CRC_check_value=calculate_CRC(message,messageLength,divisor,divisorDegree);
-fini
-               end
-               binres=[];
-           end
-       else printf("\n");end
-       if (master==0) && (secondary==0) printf("none\n");
-          kphasepos'
-          kphaseneg'
+           binres=[binres newbits]; % least significant bit (newest) to the right
+       else 
+          if (secondary!=0) binres=[binres 0 0 0 0 0 0 0];printf("0x00 appended\n")end
        end
-     until (kinit>length(z))                         % repeat for next fram of 8 or 9 bits
+       if (length(binres)>=210)
+          binres
+          % http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf
+          for m=1:length(binres)-55-divisorDegree
+            message=binres(m:m+55);                           % 56 bit long message
+            messagecrc=binres(m+55+1:m+55+1+divisorDegree-1); % 14 bit long CRC
+            evalcrc=calcCRC(message,divisor,divisorDegree);
+            if (sum(messagecrc==evalcrc)==divisorDegree)
+               printf("** SYNC FOUND **\n")
+               theend % stop execution when SYNC found
+            end
+          end
+          binres=[];
+       end
+     until (kinit>length(z)) % repeat for next frame of 8 or 9 bits until end of record
   end
 end
