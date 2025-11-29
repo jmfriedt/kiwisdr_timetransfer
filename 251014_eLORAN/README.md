@@ -26,6 +26,9 @@ including payload, CRC and FEC):
 <img src="maps1.png">
 <img src="maps2.png">
 
+Each message is 210 bit long, each GRI (67.31 ms for Anthorn) broadcasts 
+7 bits so the duration between each sentence is $67.31*(210/7)=2.02$ s
+
 ## CRC detection: ``crc_eloran.m``
 
 As known from RDS analysis, a continuous stream of bit requires 
@@ -56,18 +59,23 @@ According to <a href="https://www.reelektronika.nl/manuals/reelektronika_Differe
 is analyzed as
 * 0110: LORAN UTC (must be 0110)
 * 01: message subtype (must be 01 or 10)
-* 00111000100110111111110011100: for type 01, time at master/secondary in 
-  hours (in 10 us unit): 1187.18364 h
-* 00000000001101: hour of year (13)
-* 100000: year 32
+* 00111000100110111111110011100: time at master/secondary in hours (in 10 us
+  unit): ``bin2dec(fliplr("00001101010000000110001011100"))*1e-5`` 
+  indicates 1216.2486 and then 1220.2872, consistent with 2 seconds/message and 
+  with minutes around 20 in the hour (see .wav filename)
+* 00000000001101: hour of year (13): ``bin2dec(fliplr("00000000001101"))`` indicates
+  11264 hours ???
+* 100000: year 1 ???
 * 0: spare
 
 or for message subtype 2:
 * 0110: LORAN UTC
 * 10: message subtype
-* 01100111101101110100001011100
-* 0011101101
-* 011010011
-* 00
+* 01100111101101110100001011100: time at master/secondary in hours (in 10 us
+  unit): ``bin2dec(fliplr("01100111101101110100001011100"))*1e-5=1218.2679``
+  consistent with the previous value
+* 0011101101: precise time in 10 ns units (``bin2dec(fliplr("0011101101"))*0.01=7.32`` us)
+* 011010011: leap seconds (-54) (should be 37 ???)
+* 00: leap second change
 
 <img src="utc.png">
