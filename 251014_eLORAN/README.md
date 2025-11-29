@@ -47,7 +47,9 @@ deleted.
 ## Payload analysis
 
 According to <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">the reelektronika manual</a> on page 46, the sentence 
-0110 is LORAN UTC message, whos <a href="https://www.reelektronika.nl/manuals/reelektronika_LORADD_UTC_Manual_v1.21.pdf">format is described in this manual</a> and reproduced below:
+0110 is LORAN UTC message, whos <a href="https://www.reelektronika.nl/manuals/reelektronika_LORADD_UTC_Manual_v1.21.pdf">format is described in this manual</a> or these <a href="https://www.loran.org/proceedings/Meeting2005/Session%204%20-%20Timing,%20Differential%20Loran/Helwig-Implementation%20of%20a%20UTC%20Service%20on%20the%20NELS.pdf">slides</a> and reproduced below. 
+
+Thanks to this information, the bitstreams
 
 ```
 01100100111000100110111111110011100000000000011011000000
@@ -81,3 +83,7 @@ or for message subtype 2:
 <img src="utc.png">
 
 Message 13 is described in https://www.telecom-sync.com/files/pdfs/itsf/2014/Day1/1430-charles_curry2.pdf
+
+**TODO: hour of year, year and leap second fields are incorrectly decoded**
+
+**TODO: add FEC correction**
