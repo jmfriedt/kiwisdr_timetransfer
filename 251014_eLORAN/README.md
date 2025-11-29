@@ -31,7 +31,7 @@ Each message is 210 bit long, each GRI (67.31 ms for Anthorn) broadcasts
 
 ## CRC detection: ``crc_eloran.m``
 
-As known from RDS analysis, a continuous stream of bit requires 
+As known from RDS [1] analysis, a continuous stream of bit requires 
 synchronization, and sliding CRC calculation until a match
 is detected is one way of detecting the beginning of sentences
 in the absence of a synchronization word. Again many degrees of
@@ -63,8 +63,9 @@ is analyzed as
 * 01: message subtype (must be 01 or 10)
 * 00111000100110111111110011100: time at master/secondary in hours (in 10 us
   unit): ``bin2dec(fliplr("00001101010000000110001011100"))*1e-5`` 
-  indicates 1216.2486 and then 1220.2872, consistent with 2 seconds/message and 
-  with minutes around 20 in the hour (see .wav filename)
+  indicates 1216.2486 and then 1220.2872, consistent with 2.02 seconds/message
+  (16.24 to 20.28 after 2 sentences) and with minutes around 20 in the hour (see 
+  .wav filename)
 * 00000000001101: hour of year (13): ``bin2dec(fliplr("00000000001101"))`` indicates
   11264 hours (should be 6902 for october 14 at 14 UTC ???)
 * 100000: year 1 ???
@@ -87,3 +88,12 @@ Message 13 is described in https://www.telecom-sync.com/files/pdfs/itsf/2014/Day
 **TODO: hour of year, year and leap second fields are incorrectly decoded**
 
 **TODO: add FEC correction**
+
+[1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
+Specification of the radio data system (RDS) for VHF/FM sound broadcasting
+in the frequency range from 87,5 to 108,0 MHz</a> states: "The beginnings
+and ends of the data blocks may be recognized in the receiver decoder by
+using the fact that the error-checking decoder will, with a high level of
+confidence, detect block synchronisation slip as well as additive errors.
+This system of block synchronisation is made reliable by the addition of
+the offset words (which also serve to identify the blocks within the group)."
