@@ -40,3 +40,34 @@ At the end, many more matches than expected are provided with
 result is the file <a href="crc_eloran.txt">crc_eloran.txt</a>
 where sentences not 210 bits from their neigbours have been 
 deleted.
+
+## Payload analysis
+
+According to <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">the reelektronika manual</a> on page 46, the sentence 
+0110 is LORAN UTC message, whos <a href="https://www.reelektronika.nl/manuals/reelektronika_LORADD_UTC_Manual_v1.21.pdf">format is described in this manual</a> and reproduced below:
+
+```
+01100100111000100110111111110011100000000000011011000000
+01101001100111101101110100001011100001110110101101001100
+01100100001101010000000110001011100000000000011011000000
+01101001011110111010001001001011100001110110101101001100
+``` 
+
+is analyzed as
+* 0110: LORAN UTC (must be 0110)
+* 01: message subtype (must be 01 or 10)
+* 00111000100110111111110011100: for type 01, time at master/secondary in 
+  hours (in 10 us unit): 1187.18364 h
+* 00000000001101: hour of year (13)
+* 100000: year 32
+* 0: spare
+
+or for message subtype 2:
+* 0110: LORAN UTC
+* 10: message subtype
+* 01100111101101110100001011100
+* 0011101101
+* 011010011
+* 00
+
+<img src="utc.png">
