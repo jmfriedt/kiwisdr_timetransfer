@@ -1,6 +1,6 @@
 # eLORAN digital payload decoding
 
-## Recoring: ``command.sh``
+## Recording: ``command.sh``
 
 A 15-min long record was collected from the KiwiSDR station G0GHK 
 whose coordinates are documented in <a href="G0GHK.txt">G0GHK.txt</a>,
@@ -17,7 +17,7 @@ Attributing +/- 36 phase shift to +/-1 bit state leads to two possible
 schemes, and accumulating the bits left to right or right to left to
 another 2, hence 4 resulting files.
 
-## Preliminary analysis: bit organization ``crc_eloran.m``
+## Preliminary analysis: bit organization ``imagescall.m``
 
 Some reasonable pattern appears when mapping bit states 
 reorganized as matrices with 210 elements (sentence length 
@@ -32,7 +32,7 @@ Each message is 210 bit long, each GRI (67.31 ms for Anthorn) broadcasts
 ## CRC detection: ``crc_eloran.m``
 
 As known from RDS analysis, a continuous stream of bit requires 
-synchronization, and sliding CRC calculation untile a match
+synchronization, and sliding CRC calculation until a match
 is detected is one way of detecting the beginning of sentences
 in the absence of a synchronization word. Again many degrees of
 freedom in swapping the polynomial coefficients, bit order or
@@ -41,7 +41,7 @@ remainder order.
 At the end, many more matches than expected are provided with
 ``crc_eloran.m``, but few enough are 210 bits apart. The
 result is the file <a href="crc_eloran.txt">crc_eloran.txt</a>
-where sentences not 210 bits from their neigbours have been 
+where sentences *not* 210 bits from their neigbours have been 
 deleted.
 
 ## Payload analysis
@@ -64,7 +64,7 @@ is analyzed as
   indicates 1216.2486 and then 1220.2872, consistent with 2 seconds/message and 
   with minutes around 20 in the hour (see .wav filename)
 * 00000000001101: hour of year (13): ``bin2dec(fliplr("00000000001101"))`` indicates
-  11264 hours ???
+  11264 hours (should be 6902 for october 14 at 14 UTC ???)
 * 100000: year 1 ???
 * 0: spare
 
@@ -79,3 +79,5 @@ or for message subtype 2:
 * 00: leap second change
 
 <img src="utc.png">
+
+Message 13 is described in https://www.telecom-sync.com/files/pdfs/itsf/2014/Day1/1430-charles_curry2.pdf
