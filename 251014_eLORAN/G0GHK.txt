@@ -1,0 +1,1 @@
+d.G0GHK = struct('coord', [53.560000,-0.880000], 'host', 'g0ghk.uk', 'port', 8050);
