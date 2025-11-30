@@ -104,11 +104,23 @@ Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differe
 00101010010001111100010100011001000110100101000001111111
 ```
 
+The guess is that the first 4 bits are message ID, then 20
+unknown bits probably containing an identifier (probably 10 bits
+according to SAE9990/2) and health status, and ending with a 
+field selecting whether latitude or longitude 
+are broadcast, followed by the latitude and longitude encoded as 32 
+bit values (despite SAE9990/2 indicating position with 26 bit values) 
+in 2's complement since ``00011001000110100101000001111111``
+translates to -32876392 and ``10001111011100110101110100000100`` to
+549113585 which nicely fit the position of 
+<a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=14">
+Anthorn</a>.
+
 **TODO: add FEC correction**
 
 **TODO: understand message 13**
 
-**TODO: understand message 4**
+**TODO: understand message 4 (20 bit ID and health bits)**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
