@@ -94,6 +94,10 @@ Message 13 is <a href="https://www.telecom-sync.com/files/pdfs/itsf/2014/Day1/14
 10110001010011001010000000000000000000000000000000000000
 ```
 
+From page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">17</a> we might infer a 4-bit message ID, 10 bit station ID
+and an ASF value in us, justifying the long string of 0s
+(as leading 0s once the string is flipped).
+
 Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">Station ID/Health message</a> (page 46), and repeats
 
 ```
@@ -118,11 +122,17 @@ translates to -32876392 and ``10001111011100110101110100000100`` to
 <a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=14">
 Anthorn</a>.
 
+So the remaining unknowns are ``1111000101`` with the last bit changing to 0
+whether latitude or longitude is shown. From this same <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">post</a> as well as the screenshot
+on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">16</a> there must be some indicator of master(M)/secondary(Y) and at least 3
+bits of health status.
+
 **TODO: add FEC correction**
 
 **TODO: understand message 13**
 
-**TODO: understand message 4 (10 bit health bits/lat-lon selection)**
+**TODO: understand message 4 (10 health bits/lat-lon selection, interval
+before correction broadcast, correction priority)**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
