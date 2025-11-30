@@ -58,36 +58,57 @@ Thanks to this information, the bitstreams
 01101001011110111010001001001011100001110110101101001100
 ``` 
 
-is analyzed as
+are analyzed as
 * 0110: LORAN UTC (must be 0110)
-* 01: message subtype (must be 01 or 10)
+* 01: message subtype (must be 01 or 10, flipped bits so 01 is type 2)
 * 00111000100110111111110011100: time at master/secondary in hours (in 10 us
   unit): ``bin2dec(fliplr("00001101010000000110001011100"))*1e-5`` 
   indicates 1216.2486 and then 1220.2872, consistent with 2.02 seconds/message
   (16.24 to 20.28 after 2 sentences) and with minutes around 20 in the hour (see 
   .wav filename)
-* 00000000001101: hour of year (13): ``bin2dec(fliplr("00000000001101"))`` indicates
-  11264 hours (should be 6902 for october 14 at 14 UTC ???)
-* 100000: year 1 ???
-* 0: spare
+* 0000000000: precise time is 10 ns (=0)
+* 11011000: leap seconds between LORAN-C and UTC (=27, correct according to http://leapsecond.com/java/gpsclock.htm)
+* 00: leap second change
 
-or for message subtype 2:
+or for message subtype 1:
 * 0110: LORAN UTC
-* 10: message subtype
+* 10: message subtype (flipped bits so 1 is 10)
 * 01100111101101110100001011100: time at master/secondary in hours (in 10 us
   unit): ``bin2dec(fliplr("01100111101101110100001011100"))*1e-5=1218.2679``
   consistent with the previous value
-* 0011101101: precise time in 10 ns units (``bin2dec(fliplr("0011101101"))*0.01=7.32`` us)
-* 011010011: leap seconds (-54) (should be 37 ???)
-* 00: leap second change
+* 00111011010110: hour of year ``bin2dec(fliplr("00111011010110"))=6876`` h 
+  matching Oct. 14 at 12h UTC (see e.g. <a href="https://www.calculator.net/hours-calculator.html?today=01%2F01%2F2025&starttime2=0&startunit2=a&ageat=10%2F14%2F2025&endtime2=12&endunit2=p&ctype=2&x=Calculate#twodates">this online calculator</a>)
+* 10011: year (``bin2dec(fliplr("10011"))=25``)
+* 0: spare
 
 <img src="utc.png">
 
-Message 13 is described in https://www.telecom-sync.com/files/pdfs/itsf/2014/Day1/1430-charles_curry2.pdf
+Message 13 is <a href="https://www.telecom-sync.com/files/pdfs/itsf/2014/Day1/1430-charles_curry2.pdf">described</a> (slide 19) as ASF Differential Timing Corrections (ADTC) and found in
 
-**TODO: hour of year, year and leap second fields are incorrectly decoded**
+```
+10110001010011001010000000000000000000000000000000000000
+10110000010011010100000000000000000000000000000000000000
+10110000000000100011110000000000000000000000000000000000
+10110001010011001010000000000000000000000000000000000000
+10110000010011010100000000000000000000000000000000000000
+10110001010011001010000000000000000000000000000000000000
+```
+
+Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">Station ID/Health message</a> (page 46), and repeats
+
+```
+00101010010001111100010100011001000110100101000001111111
+00101010010001111100011010001111011100110101110100000100
+00101010010001111100010100011001000110100101000001111111
+00101010010001111100011010001111011100110101110100000100
+00101010010001111100010100011001000110100101000001111111
+```
 
 **TODO: add FEC correction**
+
+**TODO: understand message 13**
+
+**TODO: understand message 4**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
