@@ -89,7 +89,7 @@ dt=dt-dt(1);
 dt=unwrap(dt/(86400*7)*2*pi)/2/pi*86400*7;
 plot(dt/3600,solm*1000-202)
 legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31 ms)','ZAP (2.73 ms)','PEN (3.17 ms)','POL (2.26 ms)','NUR (0.86_7 ms)','MUN (0.87 ms)','location','eastoutside')
-xlabel('GPS time (s)')
+xlabel('GPS time (h)')
 ylabel('delay (ms)')
 ylim([0 5])
 figure
