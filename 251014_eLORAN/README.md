@@ -106,7 +106,9 @@ Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differe
 
 The guess is that the first 4 bits are message ID, then 20
 unknown bits probably containing an identifier (probably 10 bits
-according to SAE9990/2) and health status, and ending with a 
+according to SAE9990/2 and matching the value ``bin2dec(fliplr("1010010001"))=549``
+of <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">this 
+post on the time-nuts mailing list</a>) and health status, and ending with a 
 field selecting whether latitude or longitude 
 are broadcast, followed by the latitude and longitude encoded as 32 
 bit values (despite SAE9990/2 indicating position with 26 bit values) 
@@ -120,7 +122,7 @@ Anthorn</a>.
 
 **TODO: understand message 13**
 
-**TODO: understand message 4 (20 bit ID and health bits)**
+**TODO: understand message 4 (10 bit health bits/lat-lon selection)**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
