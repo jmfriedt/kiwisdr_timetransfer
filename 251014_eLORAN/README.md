@@ -121,9 +121,7 @@ on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential
 * 2 bits whether latitude or longitude is broadcast 
 * 32 bits of latitude or longitude in degrees in 2's complement since 
 ``00011001000110100101000001111111`` translates to -32876392 and 
-``10001111011100110101110100000100`` to 549113585 which nicely fit the position of 
-<a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">
-Anthorn</a>. 
+``10001111011100110101110100000100`` to 549113585 which nicely fit the position of <a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">Anthorn</a>. 
 
 <img src="osm.png">
 
