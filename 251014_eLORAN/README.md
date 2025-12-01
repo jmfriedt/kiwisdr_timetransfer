@@ -112,7 +112,7 @@ Thanks to Eurofix revision 2.15 document, we analyze as
 * 4 bit message ID (0010 for 4)
 * 10 bits of station ID, matching the value ``bin2dec(fliplr("1010010001"))=549``
 of <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">this 
-post on the time-nuts mailing list</a>)
+post on the time-nuts mailing list</a>
 * 3 bits of station health: 111 meaning that the reference station is not working
 * 2 bits of system indicator (10 flipped meaning eLORAN v.s Chayka)
 * 3 bits of master/secondary with 001 flipped (100) meaning Yankee secondary, matching
