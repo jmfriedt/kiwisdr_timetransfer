@@ -108,31 +108,30 @@ Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differe
 00101010010001111100010100011001000110100101000001111111
 ```
 
-The guess is that the first 4 bits are message ID, then 20
-unknown bits probably containing an identifier (probably 10 bits
-according to SAE9990/2 and matching the value ``bin2dec(fliplr("1010010001"))=549``
+Thanks to Eurofix revision 2.15 document, we analyze as
+* 4 bit message ID (0010 for 4)
+* 10 bits of station ID, matching the value ``bin2dec(fliplr("1010010001"))=549``
 of <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">this 
-post on the time-nuts mailing list</a>) and health status, and ending with a 
-field selecting whether latitude or longitude 
-are broadcast, followed by the latitude and longitude encoded as 32 
-bit values (despite SAE9990/2 indicating position with 26 bit values) 
-in 2's complement since ``00011001000110100101000001111111``
-translates to -32876392 and ``10001111011100110101110100000100`` to
-549113585 which nicely fit the position of 
-<a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=14">
-Anthorn</a>.
+post on the time-nuts mailing list</a>)
+* 3 bits of station health: 111 meaning that the reference station is not working
+* 2 bits of system indicator (10 flipped meaning eLORAN v.s Chayka)
+* 3 bits of master/secondary with 001 flipped (100) meaning Yankee secondary, matching
+this same <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">post</a> as well as the screenshot
+on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">16</a>.
+* 2 bits whether latitude or longitude is broadcast 
+* 32 bits of latitude or longitude in degrees in 2's complement since 
+``00011001000110100101000001111111`` translates to -32876392 and 
+``10001111011100110101110100000100`` to 549113585 which nicely fit the position of 
+<a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">
+Anthorn</a>. 
 
-So the remaining unknowns are ``1111000101`` with the last bit changing to 0
-whether latitude or longitude is shown. From this same <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">post</a> as well as the screenshot
-on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">16</a> there must be some indicator of master(M)/secondary(Y) and at least 3
-bits of health status.
+Message 10: this <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">web site</a>
+states that "positioning correction information" are broadcast in this message but we
+have not seen such a message
 
 **TODO: add FEC correction**
 
 **TODO: understand message 13**
-
-**TODO: understand message 4 (10 health bits/lat-lon selection, interval
-before correction broadcast, correction priority)**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
