@@ -125,6 +125,8 @@ on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential
 <a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">
 Anthorn</a>. 
 
+<img src="osm.png">
+
 Message 10: this <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">web site</a>
 states that "positioning correction information" are broadcast in this message but we
 have not seen such a message
