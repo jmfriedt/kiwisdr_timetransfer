@@ -1,0 +1,7 @@
+>> process_eloran_edited
+displ = 0
+GRI = 0.067310
+error: t(-5): subscripts must be either integers 1 to (2^63)-1 or logicals
+error: called from
+    process_eloran_edited at line 198 column 13
+           tinit=t(kinit); ##line 198
