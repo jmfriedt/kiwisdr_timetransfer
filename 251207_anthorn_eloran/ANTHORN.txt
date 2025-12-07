@@ -1,1 +1,0 @@
-d.ANTHORN = struct('coord', [50.808848,-2.477226], 'host', 'wessex.hopto.org', 'port', 8075);

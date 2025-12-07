@@ -1,1 +1,0 @@
-d.G7UAK = struct('coord', [54.069500,-3.140800], 'host', '21870.proxy.kiwisdr.com', 'port', 8073);

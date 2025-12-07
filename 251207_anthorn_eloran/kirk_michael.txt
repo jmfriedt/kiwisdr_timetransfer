@@ -1,1 +1,0 @@
-d.kirk_michael = struct('coord', [54.280000,-4.590000], 'host', '21793.proxy.kiwisdr.com', 'port', 8073);
