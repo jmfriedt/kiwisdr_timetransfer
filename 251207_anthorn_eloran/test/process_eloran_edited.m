@@ -13,7 +13,7 @@ GRI=6731*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
 impos=2;
 pmax=8;              % pulses
-number_of_bits=4200;
+number_of_bits=994;
 dlist=dir('*wav');
 pattern=[[-1 -1  0  0 +1 +1]; % 0
          [-1 -1  0 +1  0 +1]; % 1
