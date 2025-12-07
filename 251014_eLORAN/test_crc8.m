@@ -1,5 +1,4 @@
-close all
-
+clear all
 % https://fr.mathworks.com/help/matlab/matlab_prog/perform-cyclic-redundancy-check.html
 
 divisor(:,1) = fliplr([1 0 0 1 0 1 1 1 1]); % CRC-8/AUTOSAR    0x2F
@@ -16,12 +15,12 @@ checkinput=[0 0 1 1 0 0 0 1 0 0 1 1 0 0 1 0 0 0 1 1 0 0 1 1 0 0 1 1 0 1 0 0 0 0 
 
 function res=calcCRC(message, divisor, divisorDegree, init)
   if (init==0)
-  BufferInit = zeros(1,divisorDegree);
-  Input = [ message  zeros(1,divisorDegree)];
+    BufferInit = zeros(1,divisorDegree);
+    Input = [ message  zeros(1,divisorDegree)];
   else
-  BufferInit = xor(message(1:length(divisor)),divisor); % ones(1,divisorDegree);
-  %BufferInit = ones(1,divisorDegree);
-  Input = [ message zeros(1,divisorDegree)];
+    BufferInit = xor(message(1:length(divisor)),divisor); % ones(1,divisorDegree);
+    % BufferInit = ones(1,divisorDegree);
+    Input = [ message zeros(1,divisorDegree)];
   end
   for i = 1:length(Input)
     temp1 = BufferInit(end);

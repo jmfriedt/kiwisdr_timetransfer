@@ -132,7 +132,7 @@ have not seen such a message
 The conclusion found on this web page are probably also valid for 
 <a href="https://web.archive.org/web/20110210111415/http://www.ports.gov.sa/section/full_story.cfm?aid=307">Saudi Arabia</a> and <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">Korea</a>.
 
-**TODO: add FEC correction**
+**TODO: add FEC correction, using https://github.com/quiet/libfec**
 
 **TODO: understand message 13**
 
