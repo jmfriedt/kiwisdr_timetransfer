@@ -165,10 +165,11 @@ d=dir('binresneglr');
          evalcrc=calcCRC(message,divisor,divisorDegree);
          if (sum(messagecrc==evalcrc)==divisorDegree)
            % binary display
-           % printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(message,"%d"),num2str(messagecrc,"%d"),num2str(messagers,"%d"))
+           printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(messagecrc,"%d"),num2str(messagers,"%d"))
            % 7 bit display
-           printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(bin2seven(message),"%d"),num2str(bin2seven(messagecrc),"%d"),num2str(bin2seven(messagers),"%d"))
-           printf("%s: %04d flip %s      RS %s\n",d(l).name,m,num2str(bin2seven(fliplr([message messagecrc])),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+           printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(bin2seven(binres(m:m+55)),"%d"),num2str(bin2seven(messagecrc),"%d"),num2str(bin2seven(messagers),"%d"))
+           printf("%s: %04d flip %s      RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+           printf("%s: %04d flip %s CRC flip %s     RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+55))),"%d"),num2str(bin2seven(fliplr(binres(m+55+1:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
          end
       end
     end
