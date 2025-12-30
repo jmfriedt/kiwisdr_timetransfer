@@ -6,11 +6,16 @@ on time and frequency transfer.
 
 ## Compiling
 
-In ``kiwiclient/``: 
+In ``kiwiclient/src``: 
 
 ```
 mkoctfile read_kiwi_iq_wav.cc
 ```
+or from ``kiwiclient/``
+```
+make install
+```
+
 to compile the GNU/Octave binary library for reading the record contents.
 
 ## Installing
@@ -84,7 +89,8 @@ sampling rate of the KiwiSDR.
 As stated at <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109988.html">this
 time-nuts</a> mailing list archive, the digital communication protocol is described at https://www.itu.int/rec/R-REC-M.589/_page.print
 
-See the <a href="251014_eLORAN/">subdirectory</a> for a detailed analysis of eLORAN.
+See the <a href="251014_eLORAN/">subdirectory</a> for a detailed analysis of eLORAN, including CRC
+and FEC calculation and analysis of the digital payload.
 
 ## Summary
 
