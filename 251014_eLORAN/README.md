@@ -132,7 +132,47 @@ have not seen such a message
 The conclusion found on this web page are probably also valid for 
 <a href="https://web.archive.org/web/20110210111415/http://www.ports.gov.sa/section/full_story.cfm?aid=307">Saudi Arabia</a> and <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">Korea</a>.
 
-**TODO: add FEC correction, using https://github.com/quiet/libfec**
+## Reed Solomon Forward Error Correction (FEC)
+
+We rely on https://github.com/quiet/libfec for implementing FEC correction. As 
+identified and solved by Daniel Estevez:
+* RS is implemented in GF(128), meaning that the data+CRC bits must be packed
+7 by 7 since 2^7=128
+* despite being called RS(30,10), i.e. 10 input symbols made of 7 bits eachs
+($10\times 7=70=56+14$ the length of data+CRC), the RS output is necessarily 127
+symbols output, so the data must be 0-padded. This 0-padding must be done in
+the symbols *before* the payload, which must be located *before* the output
+20-symbol codeword.
+
+<img src="0padding.png">
+
+* R(30,10) in eLORAN does not use the convention of multiplying bit values $b_i$ with
+powers of alpha as $b_6\alpha^6+b_5\alpha^5+...b_0\alpha^0$ but interprets the
+bits $b_6...b_0$ as a binary word used as the power of $\alpha$. The correspondance
+between the two representations is found using the ``ALPHA_TO`` lookup table to
+convert input symbols, and ``INDEX_OF`` for converting the output solution back to
+the expected solution.
+* The bit ordering must match the definition, with the least significant symbol
+affecting the lowest power of $x$.
+* Finally, after all these issues, Daniel identified from the ITU standard that
+the RS FEC is broadcast *before* the actual data+CRC, which is indeed the case
+as found by running ``rs30_10.c`` with ``make -f Makefile.rs``:
+
+```
+index                data+CRC                                    RS FEC codeword
+0015 flip  03 3B 19 35 5C 1C 6D 1A 5F 16 RS 3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
+CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D 
+0225 flip  79 08 01 58 00 1C 73 2F 44 26 RS 27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
+CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C 
+0435 flip  79 14 19 35 5C 1C 79 44 29 16 RS 29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
+CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01 
+0645 flip  24 06 01 58 00 1C 7F 59 0E 26 RS 1F 79 5B 49 70 42 6A 4C 5E 4E 0C 3F 57 2E 7F 25 55 0E 5B 04
+```
+notice how the payload of line N matches the FEC of line N-1. To achieve this result, we use the 7-bit
+packed output of the flipped bits of ``crc_eloran.m``, namel
+```
+printf("%s: %04d flip %s RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+```
 
 **TODO: understand message 13**
 
@@ -144,3 +184,10 @@ using the fact that the error-checking decoder will, with a high level of
 confidence, detect block synchronisation slip as well as additive errors.
 This system of block synchronisation is made reliable by the addition of
 the offset words (which also serve to identify the blocks within the group)."
+
+## Compiled CRC calculation
+
+```
+pkg load coder % from github.com/shsajjadi/OctaveCoder
+octave2oct('mytest','KeepSource',true)
+```

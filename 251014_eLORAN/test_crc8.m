@@ -1,9 +1,9 @@
 clear all
 % https://fr.mathworks.com/help/matlab/matlab_prog/perform-cyclic-redundancy-check.html
 
-divisor(:,1) = fliplr([1 0 0 1 0 1 1 1 1]); % CRC-8/AUTOSAR    0x2F
+divisor(:,1) = fliplr([1 0 0 1 0 1 1 1 1]); % CRC-8/AUTOSAR    0x2F init 0xff xorout 0xff
 divisor(:,2) = fliplr([1 1 1 0 1 0 1 0 1]); % CRC-8/DVB-S2     0xD5
-divisor(:,3) = fliplr([1 1 0 0 1 1 0 1 1]); % CRC-8/LTE        0x9B
+divisor(:,3) = fliplr([1 1 0 0 1 1 0 1 1]); % CRC-8/LTE        0x9B (ou CDMA2000 avec Init 0xff)
 divisor(:,4) = fliplr([1 0 0 0 1 1 1 0 1]); % CRC-8/GMS-A      0x1D init 0x00
 divisor(:,5) = fliplr([1 0 0 0 1 1 1 0 1]); % CRC-8/HITAG      0x1D init 0xff
 divisorDegree = 8;
@@ -14,14 +14,8 @@ divisorDegree = 8;
 checkinput=[0 0 1 1 0 0 0 1 0 0 1 1 0 0 1 0 0 0 1 1 0 0 1 1 0 0 1 1 0 1 0 0 0 0 1 1 0 1 0 1 0 0 1 1 0 1 1 0 0 0 1 1 0 1 1 1 0 0 1 1 1 0 0 0 0 0 1 1 1 0 0 1];
 
 function res=calcCRC(message, divisor, divisorDegree, init)
-  if (init==0)
-    BufferInit = zeros(1,divisorDegree);
-    Input = [ message  zeros(1,divisorDegree)];
-  else
-    BufferInit = xor(message(1:length(divisor)),divisor); % ones(1,divisorDegree);
-    % BufferInit = ones(1,divisorDegree);
-    Input = [ message zeros(1,divisorDegree)];
-  end
+  Input = [ message  zeros(1,divisorDegree)];
+  BufferInit = repmat(init,1,divisorDegree); % BufferInit = zeros(1,divisorDegree);
   for i = 1:length(Input)
     temp1 = BufferInit(end);
     temp2 = temp1*divisor;
@@ -40,13 +34,19 @@ for k=[ 2 3 4]
   pol=dec2hex(bin2dec(sprintf("%d",flipud(divisor(:,k)))));
   res=dec2hex(bin2dec(sprintf("%d",calcCRC(([0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 1 ]),divisor(:,k),divisorDegree,0))));
   chk=dec2hex(bin2dec(sprintf("%d",calcCRC(checkinput,divisor(:,k),divisorDegree,0))));
-  printf("%s -> %s, chk=%s\n",pol,res,chk)
+  printf("%s -> %s, chk=%s ",pol,res,chk)
+  if (k==2) printf("(v.s. xC8/xBC)\n",pol,res,chk);end
+  if (k==3) printf("(v.s. xA1/xEA)\n",pol,res,chk);end
+  if (k==4) printf("(v.s. xC9/x37)\n",pol,res,chk);end
 end
+printf("\n");
 
-for k=[ 3 5 ]
+for k=[ 3 5 ]  % 1 : xourout=xff
   pol=dec2hex(bin2dec(sprintf("%d",flipud(divisor(:,k)))));
   res=dec2hex(bin2dec(sprintf("%d",calcCRC(([0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 1 ]),divisor(:,k),divisorDegree,1))));
   chk=dec2hex(bin2dec(sprintf("%d",calcCRC(checkinput,divisor(:,k),divisorDegree,1))));
-  if (k==5) printf("%s -> %s, chk=%s (v.s. xB4/x88)\n",pol,res,chk);end
-  if (k==3) printf("%s -> %s, chk=%s (v.s. x10/xDA)\n",pol,res,chk);end
+  printf("%s -> %s, chk=%s ",pol,res,chk);
+  if (k==1) printf("(v.s. x7C/xDF)\n",pol,res,chk);end
+  if (k==3) printf("(v.s. x10/xDA)\n",pol,res,chk);end
+  if (k==5) printf("(v.s. x88/xB4)\n",pol,res,chk);end
 end

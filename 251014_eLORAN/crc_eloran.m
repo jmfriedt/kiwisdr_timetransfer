@@ -169,7 +169,6 @@ d=dir('binresneglr');
            % 7 bit display
            printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(bin2seven(binres(m:m+55)),"%d"),num2str(bin2seven(messagecrc),"%d"),num2str(bin2seven(messagers),"%d"))
            printf("%s: %04d flip %s      RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
-           printf("%s: %04d flip %s CRC flip %s     RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+55))),"%d"),num2str(bin2seven(fliplr(binres(m+55+1:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
          end
       end
     end
