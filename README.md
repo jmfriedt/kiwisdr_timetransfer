@@ -6,8 +6,7 @@ on time and frequency transfer.
 
 ## Compiling
 
-In ``kiwiclient/``: edit ``read_kiwi_iq_wav.cc`` and comment lines 104 and 105,
-then
+In ``kiwiclient/``: 
 
 ```
 mkoctfile read_kiwi_iq_wav.cc

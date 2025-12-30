@@ -137,7 +137,7 @@ The conclusion found on this web page are probably also valid for
 We rely on https://github.com/quiet/libfec for implementing FEC correction. As 
 identified and solved by Daniel Estevez:
 * RS is implemented in GF(128), meaning that the data+CRC bits must be packed
-7 by 7 since 2^7=128
+7 by 7 since $2^7=128$.
 * despite being called RS(30,10), i.e. 10 input symbols made of 7 bits eachs
 ($10\times 7=70=56+14$ the length of data+CRC), the RS output is necessarily 127
 symbols output, so the data must be 0-padded. This 0-padding must be done in
