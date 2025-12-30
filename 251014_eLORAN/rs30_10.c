@@ -1,57 +1,54 @@
-// https://github.com/quiet/libfec -> rstest.c: {7, 0x89, 1, 1, 10, 10 },
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <fec.h>
+
+#include "fec.h"
+
+#include "char.h"
+#include "rs-common.h"
 
 // see https://github.com/quiet/libfec/blob/main/rs.c: if MM==7 /* 1 + x^3 + x^7 */
 /*
-0015 data 00110010110101101110000111001101101001101010111110010110 CRC 11011101100000 RS 10111100101010010010001111001101000001000001101100011101000000011011000111101101011001110011010111011111111101100110001011110011101111011110
-0225 data 00000011011000000000000111001110011010111110001000100110 CRC 00010001001111 RS 00110001101001000000010011011001110111100011110011111001000101000101110110101010111011010100011001011111010100110100111011111111110111110010
-
-0015 data  19 35 5C 1C 6D 1A 5F 16 CRC  6E 60 RS  5E 2A 24 3C 68 10 36 1D 00 6C 3D 56 39 57 3F 76 31 3C 77 5E
-0225 data  01 58 00 1C 73 2F 44 26 CRC  08 4F RS  18 69 00 4D 4E 78 79 79 0A 17 35 2E 6A 19 3E 53 27 3F 7B 72
+0015 flip  03 3B 19 35 5C 1C 6D 1A 5F 16 RS 3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
+CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D 
+0225 flip  79 08 01 58 00 1C 73 2F 44 26 RS 27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
+CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C 
+0435 flip  79 14 19 35 5C 1C 79 44 29 16 RS 29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
+CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01 
+0645 flip  24 06 01 58 00 1C 7F 59 0E 26 RS 1F 79 5B 49 70 42 6A 4C 5E 4E 0C 3F 57 2E 7F 25 55 0E 5B 04
 */
 
-#define K 10
-#define N 30
+#define K 10  // input symbols
+#define N 30  // code correction + symbols
+#define S 7   // GF(2^S)
 
-struct etab {
-  int symsize;
-  int genpoly;
-  int fcs;
-  int prim;
-  int nroots;
-} Tab[] = {{7, 0x89, 1, 1, N-K},};
-
-int exercise_char(struct etab *e){
-//  unsigned char data[K] = {0x19,0x35,0x5C,0x1C,0x6D,0x1A,0x5F,0x16,0x6E,0x60};
-  unsigned char data[K] = {0x03,0x3B,0x34,0x7D,0x2C,0x5B,0x1C,0x1D,0x56,0x4C};
-  int nn = (1<<e->symsize) - 1;
-  unsigned char codeword[N-K];
+int main(){
+#if CASE==1
+  unsigned char data[K]={0x79,0x08,0x01,0x58,0x00,0x1c,0x73,0x2f,0x44,0x26}; 
+#endif
+#if CASE==2
+  unsigned char data[K]={0x79,0x14,0x19,0x35,0x5C,0x1C,0x79,0x44,0x29,0x16};
+#endif
+#if CASE==3
+  unsigned char data[K]={0x24,0x06,0x01,0x58,0x00,0x1c,0x7f,0x59,0x0E,0x26};
+#endif
   int i;
-  int kk;
-  void *rs;
-
-  /* Compute code parameters */
-  kk=nn-e->nroots;
-  printf("K=%d kk=%d nn=%d\n",K,kk,nn);
-  rs=init_rs_char(7, 0x89, 1, 1, N-K, nn-N);
-  if(rs == NULL){
-    printf("init_rs_char failed!\n");
-    return -1;
-  }
-  for(i=0;i<N-K;i++) codeword[i] = 0;
-  encode_rs_char(rs,data,codeword);
-  for (i=0;i<N-K;i++) printf("%02hhX ", codeword[i]);
-      printf("\n\n");
+  void* rs;
+  const int codeword_size=(1<<S)-1;         // 2^7-1 for 7-bit
+  unsigned char codeword[codeword_size];    // 127 symbols input
+  bzero(codeword,codeword_size);
+  // printf("codeword_size=%d\n",codeword_size); codeword_size=127
+  const int nroots = N - K;
+  rs=init_rs_char(7, 0x89, 1, 1, nroots, 0);  // symsize,genpoly,fcs,prim,nroots,padding
+  struct rs *r;
+  if (rs==NULL) {printf("init_rs_char failed!\n");return -1;}
+  r=(struct rs*)rs;
+  //printf("index_of: 0->%x\n",r->index_of[0]);//          0->127
+  for (i=0;i<sizeof(data);i++) codeword[codeword_size-N+i]=r->alpha_to[data[i]]; // 0->127
+  encode_rs_char(rs,codeword,&codeword[codeword_size-nroots]);
+  for (i=codeword_size-N;i<sizeof(codeword);i++) codeword[i]=r->index_of[codeword[i]];
+  for (i=codeword_size-N;i<sizeof(codeword);i++) printf("%02hhX ",codeword[i]);
+  printf("\n");
   free_rs_char(rs);
   return 0;
 }
-
-int main(){
-  exercise_char(&Tab[0]);
-}
-

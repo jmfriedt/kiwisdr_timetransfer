@@ -1,3 +1,6 @@
 [submodule "kiwiclient"]
 	path = kiwiclient
 	url = https://github.com/jks-prv/kiwiclient
+[submodule "251014_eLORAN/libfec"]
+	path = 251014_eLORAN/libfec
+	url = https://github.com/quiet/libfec
