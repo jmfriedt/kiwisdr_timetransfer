@@ -169,12 +169,14 @@ CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 
 0645 flip  24 06 01 58 00 1C 7F 59 0E 26 RS 1F 79 5B 49 70 42 6A 4C 5E 4E 0C 3F 57 2E 7F 25 55 0E 5B 04
 ```
 notice how the payload of line N matches the FEC of line N-1. To achieve this result, we use the 7-bit
-packed output of the flipped bits of ``crc_eloran.m``, namel
+packed output of the flipped bits of ``crc_eloran.m``, namely
 ```
 printf("%s: %04d flip %s RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
 ```
 
 **TODO: understand message 13**
+
+**TODO: receiver and check message 10**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
