@@ -145,6 +145,7 @@ function binresprocess(binres)
   end
 end
 
+withoct=exist('crc14_cc.oct');
 d=dir('binresneglr');
 %for flipcode=[1 0]
 %  if (flipcode==1)
@@ -162,8 +163,15 @@ d=dir('binresneglr');
          message=fliplr(binres(m:m+55));            % 56 bit long message
          messagecrc=binres(m+55+1:m+55+1+divisorDegree-1); % 14 bit long CRC
          messagers=binres(m+55+1+divisorDegree:m+55+1+divisorDegree+140-1);
-         evalcrc=calcCRC(message,divisor,divisorDegree);
-         if (sum(messagecrc==evalcrc)==divisorDegree)
+         if (withoct==0)
+           evalcrc=calcCRC(message,divisor,divisorDegree);
+           result=(sum(messagecrc==evalcrc)==divisorDegree);
+         else
+           evalcrc=crc14_cc((2.^[7:-1:0])*reshape(message,8,[]));
+           messagecrc=(2.^[13:-1:0])*fliplr(messagecrc).';
+           result=(evalcrc==messagecrc);
+         end
+         if (result != 0)
            % binary display
            printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(messagecrc,"%d"),num2str(messagers,"%d"))
            % 7 bit display

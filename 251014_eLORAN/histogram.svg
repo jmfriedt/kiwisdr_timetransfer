@@ -6,7 +6,7 @@
    version="1.1"
    id="svg427"
    sodipodi:docname="histogram.svg"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -21,13 +21,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
-     inkscape:zoom="1.1309904"
-     inkscape:cx="261.71751"
-     inkscape:cy="176.83616"
-     inkscape:window-width="1151"
-     inkscape:window-height="723"
-     inkscape:window-x="-5"
-     inkscape:window-y="-5"
+     inkscape:zoom="2.2619808"
+     inkscape:cx="234.75"
+     inkscape:cy="241.6024"
+     inkscape:window-width="1920"
+     inkscape:window-height="975"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg427" />
   <title
@@ -1236,7 +1236,7 @@ CreationDate: Tue Oct 28 21:52:35 2025
   <g
      clip-path="url(#cp00418313)"
      id="g108"
-     transform="translate(-12.325985,-24.028795)">
+     transform="translate(-18.325985,2.971205)">
     <polygon
        fill="#ffffff"
        points="62.3822,148.732 133.533,148.732 133.533,131.694 62.3822,131.694 "
@@ -3598,4 +3598,16 @@ CreationDate: Tue Oct 28 21:52:35 2025
        stroke-width="0.5"
        id="polyline426" />
   </g>
+  <text
+     xml:space="preserve"
+     style="font-size:9px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke-width:0.75"
+     x="60.478676"
+     y="21.519621"
+     id="text1"
+     transform="rotate(3.6504277)"><tspan
+       sodipodi:role="line"
+       id="tspan1"
+       style="stroke-width:0.75"
+       x="60.478676"
+       y="21.519621">-4.3 mHz=-43 ppb @ 100 kHz</tspan></text>
 </svg>
