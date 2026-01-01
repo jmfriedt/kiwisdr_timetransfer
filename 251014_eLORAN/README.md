@@ -2,7 +2,7 @@
 
 ## Recording: ``command.sh``
 
-A 15-min long record was collected from the KiwiSDR station G0GHK 
+A 15-min long record was collected from the KiwiSDR station G0GHK
 whose coordinates are documented in <a href="G0GHK.txt">G0GHK.txt</a>,
 close enough to Anthorn to provide excellent SNR. The record
 is 20251014T122009Z_100000_G0GHK_iq.wav.
@@ -10,7 +10,7 @@ is 20251014T122009Z_100000_G0GHK_iq.wav.
 ## Pulse detection: ``process_eloran.m``
 
 The pulses are alternating Master and Secondary. We observe that all Master
-pulses exhibit 0 or 90 degree phases, i.e. no +/- 1 us shift indicating 
+pulses exhibit 0 or 90 degree phases, i.e. no +/- 1 us shift indicating
 digital payload content. Only secondary pulses include +/-36 degrees phase
 shift since +/-1 us at 100 kHz carrier is +/- 36 degrees phase shift.
 Attributing +/- 36 phase shift to +/-1 bit state leads to two possible
@@ -19,19 +19,19 @@ another 2, hence 4 resulting files.
 
 ## Preliminary analysis: bit organization ``imagescall.m``
 
-Some reasonable pattern appears when mapping bit states 
-reorganized as matrices with 210 elements (sentence length 
+Some reasonable pattern appears when mapping bit states
+reorganized as matrices with 210 elements (sentence length
 including payload, CRC and FEC):
 
 <img src="maps1.png">
 <img src="maps2.png">
 
-Each message is 210 bit long, each GRI (67.31 ms for Anthorn) broadcasts 
+Each message is 210 bit long, each GRI (67.31 ms for Anthorn) broadcasts
 7 bits so the duration between each sentence is $67.31*(210/7)=2.02$ s
 
 ## CRC detection: ``crc_eloran.m``
 
-As known from RDS [1] analysis, a continuous stream of bit requires 
+As known from RDS [1] analysis, a continuous stream of bit requires
 synchronization, and sliding CRC calculation until a match
 is detected is one way of detecting the beginning of sentences
 in the absence of a synchronization word. Again many degrees of
@@ -41,13 +41,24 @@ remainder order.
 At the end, many more matches than expected are provided with
 ``crc_eloran.m``, but few enough are 210 bits apart. The
 result is the file <a href="crc_eloran.txt">crc_eloran.txt</a>
-where sentences *not* 210 bits from their neigbours have been 
+where sentences *not* 210 bits from their neigbours have been
 deleted.
+
+## Compiled CRC calculation
+
+The C(++) 14-bit CRC program ``crc14_cc.cc`` is compatible with both
+native GNU/Linux compilation of Octave library thanks to the ``OCTAVE``
+flag: to compile both,
+```
+make
+```
+will generate ``crc14_cc.oct`` which is called by ``crc_eloran.m``,
+making the execution much faster and consistent with the C++ debugging.
 
 ## Payload analysis
 
-According to <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">the reelektronika manual</a> on page 46, the sentence 
-0110 is LORAN UTC message, whos <a href="https://www.reelektronika.nl/manuals/reelektronika_LORADD_UTC_Manual_v1.21.pdf">format is described in this manual</a> or these <a href="https://www.loran.org/proceedings/Meeting2005/Session%204%20-%20Timing,%20Differential%20Loran/Helwig-Implementation%20of%20a%20UTC%20Service%20on%20the%20NELS.pdf">slides</a> and reproduced below. 
+According to <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">the reelektronika manual</a> on page 46, the sentence
+0110 is LORAN UTC message, whos <a href="https://www.reelektronika.nl/manuals/reelektronika_LORADD_UTC_Manual_v1.21.pdf">format is described in this manual</a> or these <a href="https://www.loran.org/proceedings/Meeting2005/Session%204%20-%20Timing,%20Differential%20Loran/Helwig-Implementation%20of%20a%20UTC%20Service%20on%20the%20NELS.pdf">slides</a> and reproduced below.
 
 Thanks to this information, the bitstreams
 
@@ -56,15 +67,15 @@ Thanks to this information, the bitstreams
 01101001100111101101110100001011100001110110101101001100
 01100100001101010000000110001011100000000000011011000000
 01101001011110111010001001001011100001110110101101001100
-``` 
+```
 
 are analyzed as
 * 0110: LORAN UTC (must be 0110)
 * 01: message subtype (must be 01 or 10, flipped bits so 01 is type 2)
 * 00111000100110111111110011100: time at master/secondary in hours (in 10 us
-  unit): ``bin2dec(fliplr("00001101010000000110001011100"))*1e-5`` 
+  unit): ``bin2dec(fliplr("00001101010000000110001011100"))*1e-5``
   indicates 1216.2486 and then 1220.2872, consistent with 2.02 seconds/message
-  (16.24 to 20.28 after 2 sentences) and with minutes around 20 in the hour (see 
+  (16.24 to 20.28 after 2 sentences) and with minutes around 20 in the hour (see
   .wav filename)
 * 0000000000: precise time is 10 ns (=0)
 * 11011000: leap seconds between LORAN-C and UTC (=27, correct according to http://leapsecond.com/java/gpsclock.htm)
@@ -76,9 +87,9 @@ or for message subtype 1:
 * 01100111101101110100001011100: time at master/secondary in hours (in 10 us
   unit): ``bin2dec(fliplr("01100111101101110100001011100"))*1e-5=1218.2679``
   consistent with the previous value
-* 00111011010110: hour of year ``bin2dec(fliplr("00111011010110"))=6876`` h 
+* 00111011010110: hour of year ``bin2dec(fliplr("00111011010110"))=6876`` h
   matching Oct. 14 at 12h UTC (see e.g. <a href="https://www.calculator.net/hours-calculator.html?today=01%2F01%2F2025&starttime2=0&startunit2=a&ageat=10%2F14%2F2025&endtime2=12&endunit2=p&ctype=2&x=Calculate#twodates">this online calculator</a>)
-* 10011: year (``bin2dec(fliplr("10011"))=25``)
+* 100110: year (``bin2dec(fliplr("100110"))=25``)
 * 0: spare
 
 <img src="utc.png">
@@ -111,17 +122,17 @@ Message 4 is <a href="https://www.reelektronika.nl/manuals/reelektronika_Differe
 Thanks to Eurofix revision 2.15 document, we analyze as
 * 4 bit message ID (0010 for 4)
 * 10 bits of station ID, matching the value ``bin2dec(fliplr("1010010001"))=549``
-of <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">this 
+of <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">this
 post on the time-nuts mailing list</a>
 * 3 bits of station health: 111 meaning that the reference station is not working
 * 2 bits of system indicator (10 flipped meaning eLORAN v.s Chayka)
 * 3 bits of master/secondary with 001 flipped (100) meaning Yankee secondary, matching
 this same <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109995.html">post</a> as well as the screenshot
 on page <a href="https://www.reelektronika.nl/manuals/reelektronika_Differential_eLoran_Manual_v1.0.pdf">16</a>.
-* 2 bits whether latitude or longitude is broadcast 
-* 32 bits of latitude or longitude in degrees in 2's complement since 
-``00011001000110100101000001111111`` translates to -32876392 and 
-``10001111011100110101110100000100`` to 549113585 which nicely fit the position of <a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">Anthorn</a>. 
+* 2 bits whether latitude or longitude is broadcast
+* 32 bits of latitude or longitude in degrees in 2's complement since
+``00011001000110100101000001111111`` translates to -32876392 and
+``10001111011100110101110100000100`` to 549113585 which nicely fit the position of <a href="https://www.openstreetmap.org/?mlat=54.9113585&mlon=-3.2876392&zoom=18">Anthorn</a>.
 
 <img src="osm.png">
 
@@ -129,12 +140,12 @@ Message 10: this <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">web si
 states that "positioning correction information" are broadcast in this message but we
 have not seen such a message
 
-The conclusion found on this web page are probably also valid for 
+The conclusion found on this web page are probably also valid for
 <a href="https://web.archive.org/web/20110210111415/http://www.ports.gov.sa/section/full_story.cfm?aid=307">Saudi Arabia</a> and <a href="https://www.nmpnt.go.kr/en/sub.do?menukey=5208">Korea</a>.
 
 ## Reed Solomon Forward Error Correction (FEC)
 
-We rely on https://github.com/quiet/libfec for implementing FEC correction. As 
+We rely on https://github.com/quiet/libfec for implementing FEC correction. As
 identified and solved by Daniel Estevez:
 * RS is implemented in GF(128), meaning that the data+CRC bits must be packed
 7 by 7 since $2^7=128$.
@@ -161,11 +172,11 @@ as found by running ``rs30_10.c`` with ``make -f Makefile.rs``:
 ```
 index                data+CRC                                    RS FEC codeword
 0015 flip  03 3B 19 35 5C 1C 6D 1A 5F 16 RS 3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
-CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D 
+CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
 0225 flip  79 08 01 58 00 1C 73 2F 44 26 RS 27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
-CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C 
+CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
 0435 flip  79 14 19 35 5C 1C 79 44 29 16 RS 29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
-CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01 
+CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
 0645 flip  24 06 01 58 00 1C 7F 59 0E 26 RS 1F 79 5B 49 70 42 6A 4C 5E 4E 0C 3F 57 2E 7F 25 55 0E 5B 04
 ```
 notice how the payload of line N matches the FEC of line N-1. To achieve this result, we use the 7-bit
@@ -186,10 +197,3 @@ using the fact that the error-checking decoder will, with a high level of
 confidence, detect block synchronisation slip as well as additive errors.
 This system of block synchronisation is made reliable by the addition of
 the offset words (which also serve to identify the blocks within the group)."
-
-## Compiled CRC calculation
-
-```
-pkg load coder % from github.com/shsajjadi/OctaveCoder
-octave2oct('mytest','KeepSource',true)
-```
