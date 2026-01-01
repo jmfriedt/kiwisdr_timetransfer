@@ -46,9 +46,22 @@ int main(){
   //printf("index_of: 0->%x\n",r->index_of[0]);//          0->127
   for (i=0;i<sizeof(data);i++) codeword[codeword_size-N+i]=r->alpha_to[data[i]]; // 0->127
   encode_rs_char(rs,codeword,&codeword[codeword_size-nroots]);
+
+i=5;
+printf("data[%d] was %02hhx\n",i,data[5]);
+data[i]=0x42;
+codeword[codeword_size-N+i]=r->alpha_to[data[i]];
+int erasures=0,derrors;
+int derrlocs[codeword_size];
+derrors = decode_rs_char(rs,codeword,derrlocs,erasures);
+printf("%d errors @ %d: %02hhx\n",derrors,derrlocs[0],r->index_of[codeword[derrlocs[0]]]);
+
   for (i=codeword_size-N;i<sizeof(codeword);i++) codeword[i]=r->index_of[codeword[i]];
   for (i=codeword_size-N;i<sizeof(codeword);i++) printf("%02hhX ",codeword[i]);
   printf("\n");
   free_rs_char(rs);
   return 0;
 }
+
+
+
