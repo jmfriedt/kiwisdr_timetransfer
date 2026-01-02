@@ -185,6 +185,18 @@ packed output of the flipped bits of ``crc_eloran.m``, namely
 printf("%s: %04d flip %s RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
 ```
 
+The ``libfec`` based RS decoding has been wrapped as Octave libraries generated with ``make -f Makefile.rs``
+to produce ``rs30_10_decode.oct`` (and ``rs30_10_encode.oct`` for validation purpose but not used) which
+accepts as input a 30-symbol each 7-bit wide ([0:127]) and outputs either all 0s if the decoding process
+failed, or the corrected codeword if errors were introduced.
+
+## Final decoding script
+
+``crc_eloran.m`` will take as input the result of ``process_eloran.m`` which converts phase values
+to bits, and output bitstreams only matching the CRC and RS FEC, with very few false positives if
+any. Decoding the data payload is still completed manually once the relevant sentences have been
+printed.
+
 **TODO: understand message 13**
 
 **TODO: receiver and check message 10**
