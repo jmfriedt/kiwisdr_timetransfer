@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 extern "C"{
-#endif 
+#endif
 #include "fec.h"
 #include "char.h"
 #include "rs-common.h"
@@ -16,7 +16,7 @@ int decode_rs30_10(unsigned char *,const int);
 
 #define N 30  // code correction + symbols
 
-#ifdef OCTAVE
+#ifdef OCTAVE // Octave library wrapper
 #pragma message "Compiling for GNU/Octave"
 #include <octave/oct.h>
 DEFUN_DLD(rs30_10_decode, args, nargout, "out=rs30_10_decode(in)")
@@ -38,18 +38,18 @@ DEFUN_DLD(rs30_10_decode, args, nargout, "out=rs30_10_decode(in)")
             }
       }
  retval(0)=matout;
- return retval; 
+ return retval;
 }
-#endif
+#endif        // end of Octave
 
 // see https://github.com/quiet/libfec/blob/main/rs.c: if MM==7 /* 1 + x^3 + x^7 */
 /*
 0015 flip  03 3B 19 35 5C 1C 6D 1A 5F 16 RS 3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
-CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D 
+CASE 1     79 08 01 58 00 1C 73 2F 44 26    3D 77 1E 46 37 7E 75 4E 35 5E 1B 00 5C 36 04 0B 1E 12 2A 3D
 0225 flip  79 08 01 58 00 1C 73 2F 44 26 RS 27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
-CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C 
+CASE 2     79 14 19 35 5C 1C 79 44 29 16    27 6F 7E 72 65 3E 4C 2B 3A 56 74 28 4F 4F 0F 39 59 00 4B 0C
 0435 flip  79 14 19 35 5C 1C 79 44 29 16 RS 29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
-CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01 
+CASE 3     24 06 01 58 00 1C 7F 59 0E 26    29 35 43 34 07 67 69 15 54 12 6B 7A 27 4E 1E 2D 37 3E 01 01
 0645 flip  24 06 01 58 00 1C 7F 59 0E 26 RS 1F 79 5B 49 70 42 6A 4C 5E 4E 0C 3F 57 2E 7F 25 55 0E 5B 04
 */
 
@@ -76,8 +76,7 @@ int encode_rs30_10(unsigned char *data,int data_size, unsigned char *codeword,co
 }
 
 int decode_rs30_10(unsigned char *codeword,const int codeword_size)
-{
-  int i;
+{ int i;
   void* rs;
   int erasures=0,derrors=0;
   int derrlocs[codeword_size];
@@ -96,14 +95,11 @@ int decode_rs30_10(unsigned char *codeword,const int codeword_size)
   return(0);
 }
 
-#ifdef OCTAVE
-#endif
-
 #ifndef OCTAVE
 #pragma message "Compiling for GNU/Linux"
 int main(){
 #if CASE==1
-  unsigned char data[K]={0x79,0x08,0x01,0x58,0x00,0x1c,0x73,0x2f,0x44,0x26}; 
+  unsigned char data[K]={0x79,0x08,0x01,0x58,0x00,0x1c,0x73,0x2f,0x44,0x26};
 #endif
 #if CASE==2
   unsigned char data[K]={0x79,0x14,0x19,0x35,0x5C,0x1C,0x79,0x44,0x29,0x16};
