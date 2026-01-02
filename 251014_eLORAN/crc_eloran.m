@@ -146,6 +146,7 @@ function binresprocess(binres)
 end
 
 withoct=exist('crc14_cc.oct');
+withrs=exist('rs30_10_decode.oct');
 d=dir('binresneglr');
 %for flipcode=[1 0]
 %  if (flipcode==1)
@@ -172,11 +173,27 @@ d=dir('binresneglr');
            result=(evalcrc==messagecrc);
          end
          if (result != 0)
-           % binary display
-           printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(messagecrc,"%d"),num2str(messagers,"%d"))
-           % 7 bit display
-           printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(bin2seven(binres(m:m+55)),"%d"),num2str(bin2seven(messagecrc),"%d"),num2str(bin2seven(messagers),"%d"))
-           printf("%s: %04d flip %s      RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+           if (withrs!=0)
+              if (m>140)
+                 codeword_data=((2.^[6:-1:0])*reshape(fliplr(binres(m:m+70-1)),7,[]));  % 225: 79 14 19 35 5C 1C 79 44 29 16 
+                 codeword_rs=((2.^[6:-1:0])*reshape(fliplr(binres(m-140:m-1)),7,[]));
+                 codeword=[codeword_data codeword_rs];
+                 if (m==225) codeword(6)=0x42;end
+                 codeword_decode=rs30_10_decode(codeword);
+                 if ((sum(codeword_decode==codeword))>28) % accept 2 errors
+                    % binary display
+                    % printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(binres(m+55+1:m+55+1+divisorDegree-1),"%d"),num2str(messagers,"%d"))
+                    % 7 bit display
+                    printf("%s: %04d %s RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+                 end
+              end
+           else
+             % binary display
+             printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(messagecrc,"%d"),num2str(messagers,"%d"))
+             % 7 bit display
+             printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(bin2seven(binres(m:m+55)),"%d"),num2str(bin2seven(messagecrc),"%d"),num2str(bin2seven(messagers),"%d"))
+             printf("%s: %04d flip %s      RS %s\n",d(l).name,m,num2str(bin2seven(fliplr(binres(m:m+70-1))),"%d"),num2str(bin2seven(fliplr(messagers)),"%d"))
+           end
          end
       end
     end
