@@ -180,7 +180,7 @@ d=dir('binresneglr');
                  codeword=[codeword_data codeword_rs];
                  if (m==225) codeword(6)=0x42;end
                  codeword_decode=rs30_10_decode(codeword);
-                 if ((sum(codeword_decode==codeword))>28) % accept 2 errors
+                 if ((sum(codeword_decode==codeword))>=20) % accept 10 errors = (N-K)/2
                     % binary display
                     % printf("%s: %04d data %s CRC %s RS %s\n",d(l).name,m,num2str(binres(m:m+55),"%d"),num2str(binres(m+55+1:m+55+1+divisorDegree-1),"%d"),num2str(messagers,"%d"))
                     % 7 bit display
