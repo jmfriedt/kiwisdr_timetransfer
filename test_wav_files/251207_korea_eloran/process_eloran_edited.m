@@ -3,11 +3,13 @@
 % beginning of sentence when assembling bits?
 % how to handle missing secondary sequence (erroneous decoding?)
 
+addpath('../../kiwiclient/')
+addpath('../../kiwiclient/oct/')
 % 70 bit data including 14 bit CRC followed by 140 bit RS = 210 bit frame
 close all
 clear
 pkg load nan
-displ=0              % display plots of intermediate processing steps
+displ=1              % display plots of intermediate processing steps
 
 GRI=9930*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
@@ -150,30 +152,37 @@ ph0sbefore=[];
 ph0safter=[];
 t0before=[];
 n=1;
-%df=-0.02688;  % rad/s
 tinit=0;
 for l=1:length(dlist)
-  if (exist('x')==0)
+  df=0;
+  if (l==1) df=0.4088;th=1.5;end  % rad/s
+  if (l==2) df=-1.7588;th=1.5;end  % rad/s
+%  if (exist('x')==0)
      [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);
-  end
+     fs
+%  end
   if (isinf(fs)==0)
-     z=cat(1,xx.z);z=z(floor(fs/20):end);z50ms=z(1:floor(fs/20));
-     t=cat(1,xx.t);t=t(floor(fs/20):end);t=t-t(1);t50ms=t(1:floor(fs/20));
-     %z=z.*exp(-j*df*t); % polyfit(t,phi,1)=-0.02688
+     z=cat(1,xx.z);z=z(floor(fs*4):end);
+     t=cat(1,xx.t);t=t(floor(fs*4):end);t=t-t(1);
+     z=z.*exp(-j*df*t); % polyfit(t,phi,1)=-0.02688
+     t50ms=t(1:floor(fs*4)); z50ms=z(1:floor(fs*4));
 
 % plot the magnitude
      if (displ!=0)
+        figure
         subplot(211)
         plot(t50ms,abs(z50ms))
      end
 
-     kmag=find(abs(z50ms)<(max(abs(z50ms))/2.5));
+     kmag=find(abs(z50ms)<(max(abs(z50ms))/th));
      z50ms(kmag)=NaN;
 % plot the phases
      if (displ!=0)
+        hold on
+        plot(t50ms,abs(z50ms),'rx')
         subplot(212)
-        plot(t50ms,180/pi*angle(z50ms));hold on
-        k=find(angle(z50ms)>0);
+        plot(t50ms,180/pi*angle(z50ms),'rx');hold on
+        k=find(angle(z50ms)>=0);
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
@@ -182,7 +191,7 @@ for l=1:length(dlist)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
      end
-
+if (1==0)
      dk=round(1e-3*fs);  % samples in 1 ms (duration of each burst)
      kinit=1;
      binres=[];
@@ -312,9 +321,10 @@ for l=1:length(dlist)
 
      until (kinit>length(z)) % repeat for next frame of 8 or 9 bits until end of record
   end
-
+if (1==0)
   fid = fopen("binres", "w");
   fprintf(fid, "%d", binres);   % no spaces, no newline
   fclose(fid);
-
+end
+end % if (1==0)
 end
