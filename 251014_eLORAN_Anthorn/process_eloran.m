@@ -196,7 +196,7 @@ for l=1:length(dlist)
        kinit=kinit-1+kinittmp(1)-floor(dk/2);
        tinitold=tinit;
        tinit=t(kinit);
-       if ((abs(tinit-tinitold-0.04)>0.005) && (abs(tinit-tinitold-0.02731)>0.005) && (tinit>.1)) printf("%f burst position error\n",tinit);end
+       if ((abs(tinit-tinitold-0.04)>0.005) && (abs(tinit-tinitold-(GRI-0.04))>0.005) && (tinit>.1)) printf("%f burst position error\n",tinit);end
        tstop=tinit+11*1e-3;  % 1 ms spacing x 9 bits with last spaced by 2 ms
        kstop=find(t>=tstop);kstop=kstop(1);
        zuseful=z(kinit:kstop);
@@ -249,7 +249,7 @@ for l=1:length(dlist)
        ph(kphasepos)-=pi/2;
 
        phmean=mean(ph);ph-=phmean;  % recompute average since not the same number of pos and neg pulses in master/secondary A/B
- 
+
        master=0;
        secondary=0;
 % GRI-A
@@ -327,8 +327,8 @@ bitpos'
                 binresneglr=[binresneglr mod(resneg,2)]; % least significant bit (newest) to the right
                 respos=floor(respos/2);
                 resneg=floor(resneg/2);
-             end 
-          else 
+             end
+          else
             if (master==0) printf("respos=0\n"); end
 %           if (abs(secondary)==1)
 %              binres=[newbits binres]; % least significant bit (newest) to the right
@@ -336,7 +336,7 @@ bitpos'
 %           if (abs(secondary)==2)
 %              binres2=[binres2 newbits]; % least significant bit (newest) to the right
 %           end
-%       else 
+%       else
 %          if (secondary!=0) binres=[binres 0 0 0 0 0 0 0];printf("0x00 appended\n")end
           end
        end
