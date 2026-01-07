@@ -1,7 +1,7 @@
 # Saudi Arabia chain
 
 GRI is 8830, but only secondary emissions are received from the Qatar 
-KiwiSDR station located at 25.285400N, 51.531000E, none from Riyad or Kuwait.
+KiwiSDR station located at 25.2854N, 51.5310E, none from Riyad or Kuwait.
 
 Result of ``crc_eloran.m`` following the execution of ``process_eloran.m`` (after removing the false positive starting at position 476):
 ```

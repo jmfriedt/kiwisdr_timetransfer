@@ -1,0 +1,1 @@
+d.HL5NTR = struct('coord', [35.888778,128.574964], 'host', 'hl5ntr.ddns.net', 'port', 8074);
