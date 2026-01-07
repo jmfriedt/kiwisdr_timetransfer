@@ -9,9 +9,10 @@ addpath('../../kiwiclient/oct/')
 close all
 clear
 pkg load nan
-displ=1              % display plots of intermediate processing steps
+displ=0              % display plots of intermediate processing steps
+verbose=1
 
-GRI=9930*10/1E6      % GRI*10 us repetition period
+GRI=8830*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
 impos=2;
 pmax=8;              % pulses
@@ -155,15 +156,15 @@ n=1;
 tinit=0;
 for l=1:length(dlist)
   df=0.0088;th=1.5;
-%  if (exist('x')==0)
+  if (exist('x')==0)
      [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);
      fs
-%  end
+  end
   if (isinf(fs)==0)
-     z=cat(1,xx.z);z=z(floor(fs*4):end);
-     t=cat(1,xx.t);t=t(floor(fs*4):end);t=t-t(1);
+     z=cat(1,xx.z);z=z(floor(fs/20):end);
+     t=cat(1,xx.t);t=t(floor(fs/20):end);t=t-t(1);
      z=z.*exp(-j*df*t); % polyfit(t,phi,1)=-0.02688
-     t50ms=t(1:floor(fs*4)); z50ms=z(1:floor(fs*4));
+     t50ms=t(1:floor(fs/20)); z50ms=z(1:floor(fs/20));
 
 % plot the magnitude
      if (displ!=0)
@@ -189,21 +190,23 @@ for l=1:length(dlist)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
      end
-if (1==0)
      dk=round(1e-3*fs);  % samples in 1 ms (duration of each burst)
      kinit=1;
-     binres=[];
+     binresposlr=[];
+     binresposrl=[];
+     binresnegrl=[];
+     binresneglr=[];
      do
        if (displ!=0)
          figure
          subplot(311);
          plot(abs(z(kinit:kinit+5*GRI*fs-1)))
        end
-       kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/2.5);
+       kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/th);
        kinit=kinit-1+kinittmp(1)-floor(dk/2);
        tinitold=tinit;
        tinit=t(kinit);
-       if ((abs(tinit-tinitold-0.04)>0.005) && (abs(tinit-tinitold-0.02731)>0.005) && (tinit>.1)) printf("%f burst position error\n",tinit);end
+       if ((abs(tinit-tinitold-GRI)>0.005) && (tinit>.1)) printf("%f burst position error\n",tinit);end
        tstop=tinit+11*1e-3;  % 1 ms spacing x 9 bits with last spaced by 2 ms
        kstop=find(t>=tstop);kstop=kstop(1);
        zuseful=z(kinit:kstop);
@@ -280,49 +283,101 @@ if (1==0)
          line([0 140],[ph0-36/180/2 ph0-36/180/2])
        end
        % identify fine phase (+ with +/-36 degrees for 0/-1/+1 or - with +/-36 degrees)
-       khard=find(ph>+36/180/2*pi);bitneg(khard)=-1; % soft bit to hard bit threshold:
+       khard=find(ph>+36/180/2*pi);bitpos(khard)=+1;bitneg(khard)=-1; % soft bit to hard bit threshold:
        if ((isempty(khard)==0) && (length(phstat)<5000))
           phstat=[phstat ; ph(khard)];
        end
-       khard=find(ph<-36/180/2*pi);bitneg(khard)=+1;
+       khard=find(ph<-36/180/2*pi);bitpos(khard)=-1;bitneg(khard)=+1;
        if ((isempty(khard)==0) && (length(phstat)<5000))
           phstat=[phstat ; ph(khard)];
        end
 
 %       bit'                  % here we have 1 frame with 8 or 9 bits
-        if (sum(bitneg(3:8))!=0) printf("error\n");end
-
-        [~,resneg]=ismember(bitneg(3:8)',pattern,'rows');   % concatenate hard bits into symbol
-        resneg=resneg-1;                                    % bits (index) to byte
-
-        if (resneg>=0)
-           for m=1:7
-              binres=[binres mod(resneg,2)]; % least significant bit (newest) to the right
-              resneg=floor(resneg/2);
-           end
-        else
-            if (master==0) printf("resneg=0\n"); end
-        end
-
-##        if (length(binres)>=number_of_bits)
-##            break;
-##        end
-
-        if isnumeric(number_of_bits)
-          if (length(binres)>=number_of_bits)
-              break;
+       if ((sum(bitpos(3:8))!=0) || (bitpos(1)!=0) || (bitpos(2)!=0))
+          printf("%f: error sum !=0\n",tinit);ph'*180/pi
+bitpos'
+          binresposrl=[zeros(1,7) binresposrl];
+          binresnegrl=[zeros(1,7) binresnegrl];
+          binresposlr=[binresposlr zeros(1,7)];
+          binresneglr=[binresneglr zeros(1,7)];
+       else
+          [~,respos]=ismember(bitpos(3:8)',pattern,'rows');   % concatenate hard bits into symbol
+          % [~,respos]=ismember(bitpos(8:-1:3)',pattern,'rows');   % concatenate hard bits into symbol
+          respos=respos-1;                                    % bits (index) to byte
+          [~,resneg]=ismember(bitneg(3:8)',pattern,'rows');   % concatenate hard bits into symbol
+          % [~,resneg]=ismember(bitneg(8:-1:3)',pattern,'rows');   % concatenate hard bits into symbol
+          resneg=resneg-1;                                    % bits (index) to byte
+          if (verbose==1)
+            if (master==1)     printf("+master   A: ");end
+            if (secondary==1)  printf("+secondaryA: ");end
+            if (master==-1)    printf("-master   A: ");end
+            if (secondary==-1) printf("-secondaryA: ");end
+            if (master==2)     printf("+master   B: ");end
+            if (secondary==2)  printf("+secondaryB: ");end
+            if (master==-2)    printf("-master   B: ");end
+            if (secondary==-2) printf("-secondaryB: ");end
           end
-        elseif ischar(number_of_bits) && strcmpi(number_of_bits, 'all')
-        else
-            warning('Invalid value for number_of_bits. Use a number or "all".');
-        end
-
-     until (kinit>length(z)) % repeat for next frame of 8 or 9 bits until end of record
+          if (respos>=0)
+    %            newbitsposlr=[];
+    %            newbitsneglr=[];
+    %            newbitsposrl=[];
+    %            newbitsnegrl=[];
+            if (verbose==1) printf("pos%03d neg%03d\n",respos,resneg); end
+            for m=1:7
+%              newbitsposlr=[mod(respos,2) newbitsposlr];  % least significant bit to the right
+%              newbitsneglr=[mod(resneg,2) newbitsneglr];  % least significant bit to the right
+%              newbitsposrl=[mod(respos,2) newbitsposrl];  % least significant bit to the right
+%              newbitsnegrl=[mod(resneg,2) newbitsnegrl];  % least significant bit to the right
+               binresposrl=[mod(respos,2) binresposrl]; % least significant bit (newest) to the left
+               binresnegrl=[mod(resneg,2) binresnegrl]; % least significant bit (newest) to the left
+               binresposlr=[binresposlr mod(respos,2)]; % least significant bit (newest) to the right
+               binresneglr=[binresneglr mod(resneg,2)]; % least significant bit (newest) to the right
+               respos=floor(respos/2);
+               resneg=floor(resneg/2);
+             end 
+          else 
+             if (verbose==1) printf('\n');end
+             if (master==0) printf("respos=0\n"); end
+%           if (abs(secondary)==1)
+%              binres=[newbits binres]; % least significant bit (newest) to the right
+%           end
+%           if (abs(secondary)==2)
+%              binres2=[binres2 newbits]; % least significant bit (newest) to the right
+%           end
+%       else 
+%          if (secondary!=0) binres=[binres 0 0 0 0 0 0 0];printf("0x00 appended\n")end
+          end
+       end
+%       if (length(binresposrl)>=810)
+%          % http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf
+%binresposrl
+%binresnegrl
+%binresposlr
+%binresneglr
+%          for m=1:length(binres)-55-divisorDegree
+%            m
+%            message=binres(m:m+55);                           % 56 bit long message
+%            messagecrc=binres(m+55+1:m+55+1+divisorDegree-1); % 14 bit long CRC
+%            evalcrc=calcCRC(message,divisor,divisorDegree);
+%            if (sum(messagecrc==evalcrc)==divisorDegree)
+%               printf("** SYNC FOUND **\n")
+%               theend % stop execution when SYNC found
+%            end
+%          end
+%          binres=[];
+%       end
+     until (kinit>length(z)-5*GRI*fs) % repeat for next frame of 8 or 9 bits until end of record
   end
-if (1==0)
-  fid = fopen("binres", "w");
-  fprintf(fid, "%d", binres);   % no spaces, no newline
+  fid = fopen("binresposrl", "w");
+  fprintf(fid, "%d", binresposrl);   % no spaces, no newline
   fclose(fid);
-end
-end % if (1==0)
+  fid = fopen("binresnegrl", "w");
+  fprintf(fid, "%d", binresnegrl);   % no spaces, no newline
+  fclose(fid);
+  fid = fopen("binresposlr", "w");
+  fprintf(fid, "%d", binresposlr);   % no spaces, no newline
+  fclose(fid);
+  fid = fopen("binresneglr", "w");
+  fprintf(fid, "%d", binresneglr);   % no spaces, no newline
+  fclose(fid);
 end
