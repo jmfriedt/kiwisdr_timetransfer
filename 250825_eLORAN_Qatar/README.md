@@ -1,7 +1,7 @@
 # Saudi Arabia chain
 
-GRI is 8830, but only secondary emissions are received from the Qatar KiwiSDR station, none
-from Riyad or Kuwait.
+GRI is 8830, but only secondary emissions are received from the Qatar 
+KiwiSDR station located at 25.285400N, 51.531000E, none from Riyad or Kuwait.
 
 Result of ``crc_eloran.m`` following the execution of ``process_eloran.m`` (after removing the false positive starting at position 476):
 ```
@@ -61,3 +61,5 @@ as message 6
 * ``bin2dec(fliplr("01100100011010"))=5670`` for Aug 25 at 6 AM
 * ``bin2dec(fliplr("100110"))=25`` for 2025
 * ``0``: spare
+
+These information are in agreement with the filename ``20250825T063002Z_100000_QTR_iq.wav`` indicating that the record was collected on Aug 25, 2025 at 6:30 UTC.
