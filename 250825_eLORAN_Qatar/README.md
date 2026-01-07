@@ -47,6 +47,8 @@ as message 4 Eurofix Station ID/Health message
 * ``bin2dec(fliplr("01101011001001100010010001111000"))*1e-7``: 50.5701590 deg E
 matching the Salwa transmitter longitude
 
+<img src="2026-01-07-171405_2704x1050_scrot.png">
+
 ```
 01101000110100101110001001001101010011001000110101001100
 ```
