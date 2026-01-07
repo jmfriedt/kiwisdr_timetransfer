@@ -89,7 +89,7 @@ sampling rate of the KiwiSDR.
 As stated at <a href="https://febo.com/pipermail/time-nuts_lists.febo.com/2025-August/109988.html">this
 time-nuts</a> mailing list archive, the digital communication protocol is described at https://www.itu.int/rec/R-REC-M.589/_page.print
 
-See the <a href="251014_eLORAN/">subdirectory</a> for a detailed analysis of eLORAN, including CRC
+See the <a href="251014_eLORAN_Anthorn">subdirectory</a> for a detailed analysis of eLORAN, including CRC
 and FEC calculation and analysis of the digital payload.
 
 ## Summary
