@@ -3,8 +3,8 @@
 % beginning of sentence when assembling bits?
 % how to handle missing secondary sequence (erroneous decoding?)
 
-addpath('../../kiwiclient/')
-addpath('../../kiwiclient/oct/')
+addpath('../kiwiclient/');
+addpath('../kiwiclient/oct/');
 % 70 bit data including 14 bit CRC followed by 140 bit RS = 210 bit frame
 close all
 clear

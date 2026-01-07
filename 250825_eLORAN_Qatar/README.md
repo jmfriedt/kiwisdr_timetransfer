@@ -38,19 +38,14 @@ as message 1 as documented in ITU-R M.589-3:
 ```
 00100001111100000100100101101011001001100010010001111000
 ```
-as message 2 as documented in ITU-R M.589-3:
-* ``bin2dec(fliplr("0001111100000"))=248`` modified Z count
-* ``1``: scale
-* ``00``: User Differential Range Error (UDRE)
-* ``bin2dec(fliplr("10010"))=9`` satellite PRN
-* ``bin2dec(fliplr("110101100100110"))=12907`` Pseudo-Range Correction (PRN)
-* ``bin2dec(fliplr("00100100"))=36`` Range Rate Correction (RRC)
-* ``bin2dec(fliplr("01111000"))=30`` Issue of data (IOD)
-
-```
-00110100011010010111000100100110101001100100011010100110
-```
-as message 12 undocumented
+as message 4 Eurofix Station ID/Health message
+* ``bin2dec(fliplr("0001111100"))=248`` station ID
+* ``000``: health (000 is UDRE Scale Factor=1)
+* ``10``: eLORAN
+* ``010``: Whiskey Secondary
+* ``01``: Longitude
+* ``bin2dec(fliplr("01101011001001100010010001111000"))*1e-7``: 50.5701590 deg E
+matching the Salwa transmitter longitude
 
 ```
 01101000110100101110001001001101010011001000110101001100
