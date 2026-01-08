@@ -3,10 +3,14 @@
 % beginning of sentence when assembling bits?
 % how to handle missing secondary sequence (erroneous decoding?)
 
+addpath('../kiwiclient/');
+addpath('../kiwiclient/oct/');
 % 70 bit data including 14 bit CRC followed by 140 bit RS = 210 bit frame
 close all
+clear
 pkg load nan
 displ=0              % display plots of intermediate processing steps
+verbose=1
 
 GRI=6731*10/1E6      % GRI*10 us repetition period
 weeks=0;             % KiwiSDR timestamp in GPS second every week, resets every weekend
@@ -149,7 +153,7 @@ ph0sbefore=[];
 ph0safter=[];
 t0before=[];
 n=1;
-df=-0.02688;  % rad/s
+df=-0.02688;th=2.5;  % rad/s
 tinit=0;
 for l=1:length(dlist)
   if (exist('x')==0)
@@ -161,16 +165,19 @@ for l=1:length(dlist)
      z=z.*exp(-j*df*t); % polyfit(t,phi,1)=-0.02688
 % plot the magnitude
      if (displ!=0)
+        figure
         subplot(211)
         plot(t50ms,abs(z50ms))
      end
-     kmag=find(abs(z50ms)<(max(abs(z50ms))/2.5));
+     kmag=find(abs(z50ms)<(max(abs(z50ms))/th));
      z50ms(kmag)=NaN;
 % plot the phases
      if (displ!=0)
+        hold on
+        plot(t50ms,abs(z50ms),'rx')
         subplot(212)
-        plot(t50ms,180/pi*angle(z50ms));hold on
-        k=find(angle(z50ms)>0);
+        plot(t50ms,180/pi*angle(z50ms),'rx');hold on
+        k=find(angle(z50ms)>=0);
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
@@ -179,7 +186,6 @@ for l=1:length(dlist)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi+36)
         line([min(t50ms) max(t50ms)],[mean(angle(z50ms(k))) mean(angle(z50ms(k)))]*180/pi-36)
      end
-
      dk=round(1e-3*fs);  % samples in 1 ms (duration of each burst)
      kinit=1;
      binresposlr=[];
@@ -192,7 +198,7 @@ for l=1:length(dlist)
          subplot(311);
          plot(abs(z(kinit:kinit+5*GRI*fs-1)))
        end
-       kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/2.5);
+       kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/th);
        kinit=kinit-1+kinittmp(1)-floor(dk/2);
        tinitold=tinit;
        tinit=t(kinit);
@@ -221,9 +227,11 @@ for l=1:length(dlist)
        if (posdiff(end)>1.5) posdiff(end)-=1;end
        if (isempty(find(abs(posdiff-1)>(2/fs*1000)))==0)     % check that pulses are 1 ms apart (except last at 2 ms), +/- 1 sample
          printf("%f: pulse position error: ",tinit);
-         figure
-         plot(abs(zuseful))
-         for k=1:length(pos) line ([pos(k) pos(k)],[0 0.4]);end
+         if (displ!=0)
+           figure
+           plot(abs(zuseful))
+           for k=1:length(pos) line ([pos(k) pos(k)],[0 0.4]);end
+         end
          posdiff-1
        end
        ph=arg(zuseful(pos));
@@ -302,34 +310,37 @@ bitpos'
           [~,resneg]=ismember(bitneg(3:8)',pattern,'rows');   % concatenate hard bits into symbol
           % [~,resneg]=ismember(bitneg(8:-1:3)',pattern,'rows');   % concatenate hard bits into symbol
           resneg=resneg-1;                                    % bits (index) to byte
-%         if (master==1)     printf("+master   A: ");end
-%         if (secondary==1)  printf("+secondaryA: ");end
-%         if (master==-1)    printf("-master   A: ");end
-%         if (secondary==-1) printf("-secondaryA: ");end
-%         if (master==2)     printf("+master   B: ");end
-%         if (secondary==2)  printf("+secondaryB: ");end
-%         if (master==-2)    printf("-master   B: ");end
-%         if (secondary==-2) printf("-secondaryB: ");end
+          if (verbose==1)
+            if (master==1)     printf("+master   A: ");end
+            if (secondary==1)  printf("+secondaryA: ");end
+            if (master==-1)    printf("-master   A: ");end
+            if (secondary==-1) printf("-secondaryA: ");end
+            if (master==2)     printf("+master   B: ");end
+            if (secondary==2)  printf("+secondaryB: ");end
+            if (master==-2)    printf("-master   B: ");end
+            if (secondary==-2) printf("-secondaryB: ");end
+          end
           if (respos>=0)
-%            newbitsposlr=[];
-%            newbitsneglr=[];
-%            newbitsposrl=[];
-%            newbitsnegrl=[];
-%            printf("%d\n",res);
-             for m=1:7
+    %            newbitsposlr=[];
+    %            newbitsneglr=[];
+    %            newbitsposrl=[];
+    %            newbitsnegrl=[];
+            if (verbose==1) printf("pos%03d neg%03d\n",respos,resneg); end
+            for m=1:7
 %              newbitsposlr=[mod(respos,2) newbitsposlr];  % least significant bit to the right
 %              newbitsneglr=[mod(resneg,2) newbitsneglr];  % least significant bit to the right
 %              newbitsposrl=[mod(respos,2) newbitsposrl];  % least significant bit to the right
 %              newbitsnegrl=[mod(resneg,2) newbitsnegrl];  % least significant bit to the right
-                binresposrl=[mod(respos,2) binresposrl]; % least significant bit (newest) to the left
-                binresnegrl=[mod(resneg,2) binresnegrl]; % least significant bit (newest) to the left
-                binresposlr=[binresposlr mod(respos,2)]; % least significant bit (newest) to the right
-                binresneglr=[binresneglr mod(resneg,2)]; % least significant bit (newest) to the right
-                respos=floor(respos/2);
-                resneg=floor(resneg/2);
+               binresposrl=[mod(respos,2) binresposrl]; % least significant bit (newest) to the left
+               binresnegrl=[mod(resneg,2) binresnegrl]; % least significant bit (newest) to the left
+               binresposlr=[binresposlr mod(respos,2)]; % least significant bit (newest) to the right
+               binresneglr=[binresneglr mod(resneg,2)]; % least significant bit (newest) to the right
+               respos=floor(respos/2);
+               resneg=floor(resneg/2);
              end
           else
-            if (master==0) printf("respos=0\n"); end
+             if (verbose==1) printf('\n');end
+             if (master==0) printf("respos=0\n"); end
 %           if (abs(secondary)==1)
 %              binres=[newbits binres]; % least significant bit (newest) to the right
 %           end
@@ -358,6 +369,18 @@ bitpos'
 %          end
 %          binres=[];
 %       end
-     until (kinit>length(z)) % repeat for next frame of 8 or 9 bits until end of record
+     until (kinit>length(z)-5*GRI*fs) % repeat for next frame of 8 or 9 bits until end of record
   end
+  fid = fopen("binresposrl", "w");
+  fprintf(fid, "%d ", binresposrl);   % no spaces, no newline
+  fclose(fid);
+  fid = fopen("binresnegrl", "w");
+  fprintf(fid, "%d ", binresnegrl);   % no spaces, no newline
+  fclose(fid);
+  fid = fopen("binresposlr", "w");
+  fprintf(fid, "%d ", binresposlr);   % no spaces, no newline
+  fclose(fid);
+  fid = fopen("binresneglr", "w");
+  fprintf(fid, "%d ", binresneglr);   % no spaces, no newline
+  fclose(fid);
 end

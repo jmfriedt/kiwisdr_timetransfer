@@ -172,7 +172,6 @@ for l=1:length(dlist)
         subplot(211)
         plot(t50ms,abs(z50ms))
      end
-
      kmag=find(abs(z50ms)<(max(abs(z50ms))/th));
      z50ms(kmag)=NaN;
 % plot the phases
@@ -334,8 +333,8 @@ bitpos'
                binresneglr=[binresneglr mod(resneg,2)]; % least significant bit (newest) to the right
                respos=floor(respos/2);
                resneg=floor(resneg/2);
-             end 
-          else 
+             end
+          else
              if (verbose==1) printf('\n');end
              if (master==0) printf("respos=0\n"); end
 %           if (abs(secondary)==1)
@@ -344,7 +343,7 @@ bitpos'
 %           if (abs(secondary)==2)
 %              binres2=[binres2 newbits]; % least significant bit (newest) to the right
 %           end
-%       else 
+%       else
 %          if (secondary!=0) binres=[binres 0 0 0 0 0 0 0];printf("0x00 appended\n")end
           end
        end
@@ -369,15 +368,15 @@ bitpos'
      until (kinit>length(z)-5*GRI*fs) % repeat for next frame of 8 or 9 bits until end of record
   end
   fid = fopen("binresposrl", "w");
-  fprintf(fid, "%d", binresposrl);   % no spaces, no newline
+  fprintf(fid, "%d ", binresposrl);   % no spaces, no newline
   fclose(fid);
   fid = fopen("binresnegrl", "w");
-  fprintf(fid, "%d", binresnegrl);   % no spaces, no newline
+  fprintf(fid, "%d ", binresnegrl);   % no spaces, no newline
   fclose(fid);
   fid = fopen("binresposlr", "w");
-  fprintf(fid, "%d", binresposlr);   % no spaces, no newline
+  fprintf(fid, "%d ", binresposlr);   % no spaces, no newline
   fclose(fid);
   fid = fopen("binresneglr", "w");
-  fprintf(fid, "%d", binresneglr);   % no spaces, no newline
+  fprintf(fid, "%d ", binresneglr);   % no spaces, no newline
   fclose(fid);
 end
