@@ -3,6 +3,12 @@
 GRI is 8830, but only secondary emissions are received from the Qatar 
 KiwiSDR station located at 25.2854N, 51.5310E, none from Riyad or Kuwait.
 
+The secondary emission (matching the pulse phase pattern of SecondaryA/SecondaryB)
+holds 9 bursts with +/-1 us delay: only the first 8 are considered according to the
+Eurofix specification.
+
+<img src="saudi_time.png">
+
 Result of ``crc_eloran.m`` following the execution of ``process_eloran.m`` (after removing the false positive starting at position 476):
 ```
 0057 data 10000010101111010000001111001111010111110000000010001001 CRC 10011100001000 RS 01001011011000100000010100101000000000100001101101000010011001010100111011001110111111101011110111111000100010110010000101101001111111110000
