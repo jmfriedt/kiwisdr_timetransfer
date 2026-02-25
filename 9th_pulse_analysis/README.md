@@ -4,7 +4,7 @@ pulse and is positioned 0 to 160 us to encode the 32 possible bit values.
 <img src="2026-02-25-190717_2704x1050_scrot.png">
 
 When sampling at 12 kHz, 1 ms lasts 12 samples, so the 9th pulse position starts
-12 samples after the 9th.
+12 samples after the 8th.
 
 When sampling at 12 kHz, the sampling period is 83.33 us so that two delay values
 are included in each subsequent sample, bit values 0 to 15 (delays 0 to 60 us) in
