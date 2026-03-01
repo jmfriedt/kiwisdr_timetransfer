@@ -59,3 +59,9 @@ From another KiwiSDR station close to Seattle and its George (W. state) emitter 
 is easier to analyze:
 
 <img src="260301_USA/9th_pulse_Seattle.png">
+
+and so is the analysis of the recording from Utah
+
+<img src="260301_USA/9th_pulse_utah.png">
+
+concluding with probably the Nevada station (Fallon) not broadcasting a 9th pulse digital message.
