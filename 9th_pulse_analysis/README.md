@@ -1,3 +1,5 @@
+# 9th pulse position coding
+
 According to SAE9990/2 (see below), the 9th pulse starts 1000 us after the 8th
 pulse and is positioned 0 to 160 us to encode the 32 possible bit values.
 
@@ -26,3 +28,6 @@ by 22.5 degrees instead of the 36 degrees of the Eurofix.
 
 The <a href="plot_9pulse_histo.m">plot_9pulse_histo.m</a> script simulates the 
 expected phase distribution as a function of bit value.
+
+https://www.ion.org/itm/abstracts.cfm?paperID=15124 states that 2 of the 3 USA west-coast
+stations are broadcasting the the Loran Data Channel (LDC).
