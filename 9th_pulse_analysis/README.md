@@ -29,5 +29,25 @@ by 22.5 degrees instead of the 36 degrees of the Eurofix.
 The <a href="plot_9pulse_histo.m">plot_9pulse_histo.m</a> script simulates the 
 expected phase distribution as a function of bit value.
 
+## Real signal analysis
+
+The KiwiSDR located at 35.6N, 117.8W (21214.proxy.kiwisdr.com) was used to record
+a signal from the USA west coast chain.
+
 https://www.ion.org/itm/abstracts.cfm?paperID=15124 states that 2 of the 3 USA west-coast
 stations are broadcasting the the Loran Data Channel (LDC).
+
+https://www.ursanav.com/wp-content/uploads/UrsaNav-ILA-40-eLoran-Signal-Specification-Tutorial.pdf
+states that "The 9th Master pulse in the 10th pulse slot is no longer needed for identification 
+and can be removed. This improves cross-rate interference and frees up the slot for the LDC." so
+that the 9th pulse polarity is now considered as carrying data.
+
+However, as can be seen on
+
+<img src="9th_pulse_USA.png">
+
+identifying pulse positions only separated by 22.5 degrees is very difficult with the
+available signal to noise ratio. No obvious pattern allowing to identify a 9th pulse
+position information on either master or secondary station is visible, despite the
+phase being uniformly distributed between 0 and 360 degrees (the magnitude of the pulse
+was verified to assess that this is not noise).

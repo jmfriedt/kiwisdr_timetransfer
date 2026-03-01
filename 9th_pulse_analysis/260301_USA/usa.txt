@@ -1,0 +1,1 @@
+d.usa = struct('coord', [35.600000,-117.800000], 'host', '21214.proxy.kiwisdr.com', 'port', 8073);
