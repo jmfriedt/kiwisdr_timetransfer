@@ -25,7 +25,7 @@ pmm=[];
 pms=[];
 pm=[];
 ps=[];
-for l=1:length(dlist)
+for l=3:length(dlist)
   df=0.0000;th=1.5;
 %  if (exist('x')==0)
      [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);

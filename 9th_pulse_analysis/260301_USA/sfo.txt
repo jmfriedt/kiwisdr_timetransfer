@@ -1,0 +1,1 @@
+d.sfo = struct('coord', [38.180000,-121.790000], 'host', '22085.proxy.kiwisdr.com', 'port', 8073);

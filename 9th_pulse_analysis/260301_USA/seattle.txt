@@ -1,0 +1,1 @@
+d.seattle = struct('coord', [47.420000,-122.030000], 'host', 'kiwi.n1cldesigns.com', 'port', 8074);

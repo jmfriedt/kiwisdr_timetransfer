@@ -31,11 +31,11 @@ expected phase distribution as a function of bit value.
 
 ## Real signal analysis
 
-The KiwiSDR located at 35.6N, 117.8W (21214.proxy.kiwisdr.com) was used to record
-a signal from the USA west coast chain.
+The KiwiSDRs located at 35.6N, 117.8W (21214.proxy.kiwisdr.com) and 38.18N, 121.79W (22085.proxy.kiwisdr.com)
+were used to record signals from the USA west coast chain.
 
 https://www.ion.org/itm/abstracts.cfm?paperID=15124 states that 2 of the 3 USA west-coast
-stations are broadcasting the the Loran Data Channel (LDC).
+stations are broadcasting the Loran Data Channel (LDC).
 
 https://www.ursanav.com/wp-content/uploads/UrsaNav-ILA-40-eLoran-Signal-Specification-Tutorial.pdf
 states that "The 9th Master pulse in the 10th pulse slot is no longer needed for identification 
@@ -51,3 +51,11 @@ available signal to noise ratio. No obvious pattern allowing to identify a 9th p
 position information on either master or secondary station is visible, despite the
 phase being uniformly distributed between 0 and 360 degrees (the magnitude of the pulse
 was verified to assess that this is not noise).
+
+At least this KiwiSDR station seems to have a nicely GNSS-disciplined oscillator since hardly
+any phase drift can be seen.
+
+From another KiwiSDR station close to Seattle and its George (W. state) emitter the result
+is easier to analyze:
+
+<img src="260301_USA/9th_pulse_Seattle.png">
