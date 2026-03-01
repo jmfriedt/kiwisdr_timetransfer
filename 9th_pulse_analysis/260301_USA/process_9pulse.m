@@ -25,7 +25,7 @@ pmm=[];
 pms=[];
 pm=[];
 ps=[];
-for l=3:length(dlist)
+for l=4:length(dlist)
   df=0.0000;th=1.5;
 %  if (exist('x')==0)
      [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);
@@ -72,7 +72,11 @@ for l=3:length(dlist)
        kinit=kinit-1+kinittmp(1)-floor(dk/2);
        tinitold=tinit;
        tinit=t(kinit);
-       if (((abs(tinit-tinitold-(GRI-0.01122))>0.005)&&(abs(tinit-tinitold-0.01122)>0.005)) && (tinit>.1)) printf("%f burst position error\n",tinit);end
+       if (l>=3)
+          if ((abs(tinit-tinitold-(GRI))>0.005) && (tinit>.1)) printf("%f burst position error\n",tinit);end
+       else
+          if (((abs(tinit-tinitold-(GRI-0.01122))>0.005)&&(abs(tinit-tinitold-0.01122)>0.005)) && (tinit>.1)) printf("%f burst position error\n",tinit);end
+       end
        tstop=tinit+10*1e-3;  % 1 ms spacing x 9 bits with last spaced by 2 ms
        kstop=find(t>=tstop);kstop=kstop(1);
        zuseful=z(kinit:kstop);
