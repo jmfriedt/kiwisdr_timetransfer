@@ -44,7 +44,7 @@ that the 9th pulse polarity is now considered as carrying data.
 
 However, as can be seen on
 
-<img src="9th_pulse_USA.png">
+<img src="260301_USA/9th_pulse_USA.png">
 
 identifying pulse positions only separated by 22.5 degrees is very difficult with the
 available signal to noise ratio. No obvious pattern allowing to identify a 9th pulse
