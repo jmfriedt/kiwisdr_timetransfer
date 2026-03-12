@@ -3,7 +3,7 @@
 According to SAE9990/2 (see below), the 9th pulse starts 1000 us after the 8th
 pulse and is positioned 0 to 160 us to encode the 32 possible bit values.
 
-<img src="2026-02-25-190717_2704x1050_scrot.png">
+<img src="pictures/2026-02-25-190717_2704x1050_scrot.png">
 
 When sampling at 12 kHz, 1 ms lasts 12 samples, so the 9th pulse position starts
 12 samples after the 8th.
