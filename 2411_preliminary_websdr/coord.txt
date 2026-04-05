@@ -1,0 +1,6 @@
+Y	X	N
+53.0833	18.2258	Solec_Kujawski
+50.0294	9.0252	Mainflingen
+47.1659	2.2279	Allouis
+54.9101	-3.2618	Anthorn
+52.2215	6.8937	Enschede
