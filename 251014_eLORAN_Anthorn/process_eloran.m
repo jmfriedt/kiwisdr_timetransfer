@@ -9,7 +9,7 @@ addpath('../kiwiclient/oct/');
 close all
 clear
 pkg load nan
-displ=0              % display plots of intermediate processing steps
+displ=1              % display plots of intermediate processing steps
 verbose=1
 
 GRI=6731*10/1E6      % GRI*10 us repetition period
@@ -160,15 +160,18 @@ for l=1:length(dlist)
      [x,xx,fs,last_gpsfix]=proc_kiwi_iq_wav(dlist(l).name);
   end
   if (isinf(fs)==0)
-     z=cat(1,xx.z);z=z(floor(fs/20):end);z50ms=z(1:floor(fs/20));
-     t=cat(1,xx.t);t=t(floor(fs/20):end);t=t-t(1);t50ms=t(1:floor(fs/20));
+     z=cat(1,xx.z);z=z(floor(fs*4):end);
+     t=cat(1,xx.t);t=t(floor(fs*4):end);t=t-t(1);
      z=z.*exp(-j*df*t); % polyfit(t,phi,1)=-0.02688
+     t50ms=t(1:floor(fs*4)); z50ms=z(1:floor(fs*4));
+
 % plot the magnitude
      if (displ!=0)
         figure
         subplot(211)
         plot(t50ms,abs(z50ms))
      end
+
      kmag=find(abs(z50ms)<(max(abs(z50ms))/th));
      z50ms(kmag)=NaN;
 % plot the phases
@@ -282,8 +285,8 @@ for l=1:length(dlist)
        if (displ!=0)
          hold on
          subplot(313); plot(pos,ph,'bx');xlim([0 140])
-         line([0 140],[ph0+36/180/2 ph0+36/180/2])
-         line([0 140],[ph0-36/180/2 ph0-36/180/2])
+         line([0 140],[ph0+36/180/2*pi ph0+36/180/2*pi])
+         line([0 140],[ph0-36/180/2*pi ph0-36/180/2*pi])
        end
        % identify fine phase (+ with +/-36 degrees for 0/-1/+1 or - with +/-36 degrees)
        khard=find(ph>+36/180/2*pi);bitpos(khard)=+1;bitneg(khard)=-1; % soft bit to hard bit threshold:

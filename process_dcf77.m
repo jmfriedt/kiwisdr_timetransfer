@@ -1,7 +1,7 @@
 clear all
 close all
 pkg load signal
-addpath('./kiwiclient')
+addpath('./kiwiclient/oct/','./kiwiclient')
 
 # sudo apt install octave-dev
 # mkoctfile read_kiwi_iq_wav.cc
@@ -98,3 +98,5 @@ legend('ON5 (1.41 ms)','ECH (2.26 ms)','FR (2.80 ms)','G80 (X.XX ms)','G8U (2.31
 xlabel('GPS time (h)')
 ylabel('delay with fit (ms)')
 ylim([0 5])
+save -text MUN_DCF solm(:,10)
+save -text MUN_NUR solm(:,9)

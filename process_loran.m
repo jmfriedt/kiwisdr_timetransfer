@@ -1,6 +1,6 @@
 clear all
 close all
-addpath('./kiwiclient')
+addpath('./kiwiclient/oct/','./kiwiclient/')
 
 pkg load nan
 # sudo apt install octave-dev
@@ -105,19 +105,20 @@ figure
 k=find(dt>0);dt=dt(k);solm=solm(k,:);solf=solf(k,:);
 dt=dt-dt(1);
 % dt=unwrap(dt/(86400*7)*2*pi)/2/pi*86400*7;
-plot(dt/3600,solm*1000-1167)
+plot(dt/3600,solm*1000-1160.05)
 hold on
-plot(dt/3600,solf-1167)
+plot(dt/3600,solf-1160.05)
 xlabel('GPS time (h)')
 ylabel('delay (ms)')
-line([0 80],[0.1 0.1]+1000/fs)  % sampling period in ms
-line([0 80],[0.1 0.1]+2000/fs)
+line([0 180],[0.1 0.1]+1000/fs)  % sampling period in ms
+line([0 180],[0.1 0.1]+2000/fs)
 figure
-plot(dt/3600,solm*1000-1167)
+plot(dt/3600,solm*1000-1160.05)
 hold on
-plot(dt/3600,solf-1167)
+plot(dt/3600,solf-1160.05)
 xlabel('GPS time (h)')
 ylabel('delay (ms)')
-line([0 80],[0.1 0.1]+1000/fs)  % sampling period in ms
-line([0 80],[0.1 0.1]+2000/fs)
+line([0 180],[0.1 0.1]+1000/fs)  % sampling period in ms
+line([0 180],[0.1 0.1]+2000/fs)
 ylim([0 5])
+save -text QTR_LOR solm(:,1)

@@ -4,6 +4,11 @@ Recording GPS-timestamped KiwiSDR datasets from ALS162 (162 kHz), LORAN (100 kHz
 DCF77 (77.5 kHz) for assessing the impact of ionosphere and space weather disturbances
 on time and frequency transfer.
 
+Investigation prompted by my watch radiofrequency synchronization capability and VLF
+probing of the ionospheric propagation conditions.
+
+<img src="2411_preliminary_websdr/2024-11-10-114822_2944x1080_scrot.png">
+
 ## Compiling
 
 In ``kiwiclient/src``: 

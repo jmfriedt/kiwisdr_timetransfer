@@ -199,7 +199,7 @@ printed.
 
 **TODO: understand message 13**
 
-**TODO: receiver and check message 10**
+**TODO: receive and check message 10**
 
 [1] p.14 of <a href="http://jmfriedt.free.fr/EN50067_RDS_Standard.pdf">
 Specification of the radio data system (RDS) for VHF/FM sound broadcasting
@@ -209,3 +209,14 @@ using the fact that the error-checking decoder will, with a high level of
 confidence, detect block synchronisation slip as well as additive errors.
 This system of block synchronisation is made reliable by the addition of
 the offset words (which also serve to identify the blocks within the group)."
+
+# see https://github.com/aff3ct/my_project_with_aff3ct/
+
+Using aff3ct instead of libfec would be suitable, but we were unable to figure
+out how to adapt this library to our needs
+
+```
+cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-funroll-loops -march=native" -DAFF3CT_COMPILE_EXE="OFF" -DAFF3CT_COMPILE_STATIC_LIB="ON" -DAFF3CT_COMPILE_SHARED_LIB="ON"
+g++ -Ilibfec -Iaff3ct/include/ -Iaff3ct/lib/cli/src/ -Iaff3ct/lib/streampu/include/ -Iaff3ct/lib/cli/lib/rang/include/ -Iaff3ct/lib/MIPP/src/ aff.cc -DCASE=1 -Llibfec -L aff3ct/buil/lib/ -lfec -laff3ct-4.1.0 -std=c++17
+export LD_LIBRARY_PATH=aff3ct/buil/lib
+```

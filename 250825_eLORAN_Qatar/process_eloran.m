@@ -152,6 +152,7 @@ phstat=[];
 ph0sbefore=[];
 ph0safter=[];
 t0before=[];
+lastpeak=[];
 n=1;
 tinit=0;
 for l=1:length(dlist)
@@ -199,7 +200,7 @@ for l=1:length(dlist)
        if (displ!=0)
          figure
          subplot(311);
-         plot(abs(z(kinit:kinit+5*GRI*fs-1)))
+         plot(t(kinit:kinit+5*GRI*fs-1),abs(z(kinit:kinit+5*GRI*fs-1)))
        end
        kinittmp=find(abs(z(kinit:kinit+5*GRI*fs-1))>max(abs(z(kinit:5*GRI*fs+kinit-1)))/th);
        kinit=kinit-1+kinittmp(1)-floor(dk/2);
@@ -210,20 +211,19 @@ for l=1:length(dlist)
        kstop=find(t>=tstop);kstop=kstop(1);
        zuseful=z(kinit:kstop);
        if (displ!=0)
-         subplot(312); plot(abs(zuseful));
+         subplot(312); plot(t(kinit:kstop),abs(zuseful));
        end
                               % threshold amplitude and detect phase and amplitude maxima
        k=find(abs(zuseful)>max(abs(zuseful))/2.5); k=k(1);
        clear pos ph
        for m=1:9
-          if (m<=8)
+          if (m<=8) 
             [~,pos(m)]=max(abs(zuseful(k+(m-1)*dk:k+m*dk-dk/2)));  % do not go too far over next bit
             pos(m)=pos(m)+k+(m-1)*dk-1;
           else
-            [val,tmppos]=max(abs(zuseful(k+(m)*dk:end)));
-            if (val>max(abs(zuseful)/2.5))
-               pos(m)=tmppos+k+m*dk-1;
-            end
+            % [val,tmppos]=max(abs(zuseful(k+(m)*dk:end)));
+            [~,tmppos]=max(abs(zuseful(k+(m-1)*dk:k+m*dk-dk/2)));  % do not go too far over next bit
+            tmppos=tmppos+k+(m-1)*dk-1;
           end
        end
        posdiff=diff(pos/fs*1e3);  % in ms
@@ -232,21 +232,24 @@ for l=1:length(dlist)
          printf("%f: pulse position error: ",tinit);
          if (displ!=0)
            figure
-           plot(abs(zuseful))
-           for k=1:length(pos) line ([pos(k) pos(k)],[0 0.4]);end
+           plot(t(kinit:kstop),abs(zuseful))
+           for k=1:length(pos) line ([pos(k)/fs pos(k)/fs],[0 0.4]);end
          end
          posdiff-1
        end
        ph=arg(zuseful(pos));
+       phtmp=arg(zuseful(tmppos));
+       tmppos=t(tmppos)-t(pos(1));
 
        phmean=mean(ph); % /!\ not the same number of positive and neg pulses
        ph0sbefore=[ph0sbefore ; phmean];
        t0before=[t0before ; tinit];
        ph-=phmean;
+       phtmp-=phmean; 
 
        kinit=kstop+dk*5;
        if (displ!=0)
-         subplot(313); plot(pos,ph,'ro');xlim([0 140])
+%         subplot(313); plot(pos/fs,ph,'ro');xlim([0 140/fs])
        end
        kphasepos=find(ph>0);
        kphaseneg=find(ph<=0); % first find all the positive and negative and THEN shift
@@ -254,6 +257,9 @@ for l=1:length(dlist)
        ph(kphasepos)-=pi/2;
 
        phmean=mean(ph);ph-=phmean;  % recompute average since not the same number of pos and neg pulses in master/secondary A/B
+       phtmp-=phmean; 
+       printf(" phtmp %f us @ %f ",(phtmp)/2/pi*10,tmppos*1e6-8000) % XXX
+lastpeak=[lastpeak tmppos*1e6-8000+phtmp/2/pi*10];
 
        master=0;
        secondary=0;
@@ -277,9 +283,9 @@ for l=1:length(dlist)
        ph0safter=[ph0safter ; ph(1:2)];
        if (displ!=0)
          hold on
-         subplot(313); plot(pos,ph,'bx');xlim([0 140])
-         line([0 140],[ph0+36/180/2 ph0+36/180/2])
-         line([0 140],[ph0-36/180/2 ph0-36/180/2])
+         subplot(313); plot(pos/fs,ph,'bx');xlim([0 140/fs])
+         line([0 140]/fs,[ph0+36/180/2 ph0+36/180/2])
+         line([0 140]/fs,[ph0-36/180/2 ph0-36/180/2])
        end
        % identify fine phase (+ with +/-36 degrees for 0/-1/+1 or - with +/-36 degrees)
        khard=find(ph>+36/180/2*pi);bitpos(khard)=+1;bitneg(khard)=-1; % soft bit to hard bit threshold:
